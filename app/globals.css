@@ -1,26 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+html,
+body {
+  background: #050505;
+  color: #efe6d4;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.hero-wash {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(90% 80% at 50% -10%, rgba(226, 180, 42, 0.55) 0%, rgba(226, 180, 42, 0.18) 38%, transparent 68%),
+    radial-gradient(50% 45% at 100% 0%, rgba(226, 180, 42, 0.16) 0%, transparent 55%),
+    #050505;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.hero-wash::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 120px;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, #050505);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #050505;
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #1a1610;
+  color: #fff;
+}
+
+.bg-cream,
+.bg-\[\#f7f5f1\] {
+  color: #0b0906;
+}
+
+.atmosphere {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: transparent;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 38%, transparent 70%);
+  mask-image: linear-gradient(180deg, #000 0%, #000 38%, transparent 70%);
+}
+.atmosphere-glow {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(80px);
+  will-change: transform;
+}
+.atmosphere-glow-a {
+  top: -28%;
+  left: 50%;
+  width: min(90vw, 1100px);
+  height: min(58vw, 680px);
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(226, 180, 42, 0.5) 0%, rgba(226, 180, 42, 0) 70%);
+  animation: atmosphere-drift-a 16s ease-in-out infinite;
+}
+.atmosphere-glow-b {
+  top: 4%;
+  right: -12%;
+  width: min(58vw, 640px);
+  height: min(58vw, 640px);
+  background: radial-gradient(circle, rgba(138, 106, 40, 0.4) 0%, rgba(138, 106, 40, 0) 72%);
+  animation: atmosphere-drift-b 22s ease-in-out infinite;
+}
+.atmosphere-glow-c {
+  top: 28%;
+  left: 28%;
+  width: min(40vw, 420px);
+  height: min(28vw, 280px);
+  background: radial-gradient(circle, rgba(255, 236, 190, 0.18) 0%, rgba(255, 236, 190, 0) 70%);
+  animation: atmosphere-drift-c 19s ease-in-out infinite;
+}
+.atmosphere-grain {
+  position: absolute;
+  inset: -20%;
+  opacity: 0.12;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.35) 0.6px, transparent 0.7px);
+  background-size: 3px 3px;
+  animation: atmosphere-grain 10s steps(8) infinite;
+}
+@keyframes atmosphere-drift-a {
+  0%, 100% { transform: translateX(-50%) translate3d(0, 0, 0) scale(1); }
+  50% { transform: translateX(-50%) translate3d(8%, 8%, 0) scale(1.12); }
+}
+@keyframes atmosphere-drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-14%, 8%, 0) scale(1.18); }
+}
+@keyframes atmosphere-drift-c {
+  0%, 100% { transform: translate3d(0, 8%, 0) scale(1); opacity: 0.7; }
+  50% { transform: translate3d(10%, -6%, 0) scale(1.2); opacity: 1; }
+}
+@keyframes atmosphere-grain {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-4%, 3%, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atmosphere-glow,
+  .atmosphere-grain { animation: none; }
 }
