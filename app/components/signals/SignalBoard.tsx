@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { isAdmin } from "../../lib/admin";
+import { useVip } from "../../lib/vip";
 import {
   ageLabel,
   ticketTitle,
@@ -66,7 +67,8 @@ function OpenRows({ ticket }: { ticket: Ticket }) {
 export function SignalBoard() {
   const [filter, setFilter] = useState<Filter>("all");
   const { user } = useAuth();
-  const unlocked = isAdmin(user?.email);
+  const vip = useVip(user?.email);
+  const unlocked = isAdmin(user?.email) || vip;
   const { tickets } = useDesk();
 
   const rows = useMemo(() => {

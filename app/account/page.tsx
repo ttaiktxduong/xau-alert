@@ -5,10 +5,14 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "../components/auth/AuthProvider";
 import { isAdmin } from "../lib/admin";
+import { roleLabel, useRole } from "../lib/roles";
+import { grantVip, revokeVip, useVip } from "../lib/vip";
 
 export default function AccountPage() {
   const { user, ready, logout } = useAuth();
   const router = useRouter();
+  const vip = useVip(user?.email);
+  const role = useRole(user?.email);
 
   useEffect(() => {
     if (ready && !user) router.replace("/login");
@@ -49,6 +53,9 @@ export default function AccountPage() {
                   {user.name}
                 </p>
                 <p className="mt-1 text-sm text-white/50">{user.email}</p>
+                <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#E2B42A]">
+                  {roleLabel(role)}
+                </p>
               </div>
             </div>
             <p className="relative mt-5 text-xs text-white/35">
@@ -71,12 +78,18 @@ export default function AccountPage() {
                 Admin desk
               </Link>
             ) : null}
-            <Link
-              href="/#pricing"
-              className="rounded-[22px] bg-[#121212] px-5 py-4 text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
-            >
-              Unlock VIP
-            </Link>
+            {role === "admin" ? null : (
+              <button
+                type="button"
+                onClick={() => {
+                  if (vip) revokeVip(user.email);
+                  else grantVip("vip", user.email);
+                }}
+                className="rounded-[22px] bg-[#121212] px-5 py-4 text-left text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
+              >
+                {vip ? "Lock VIP preview" : "Preview VIP (demo)"}
+              </button>
+            )}
           </div>
 
           <button

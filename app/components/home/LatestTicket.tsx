@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "../auth/AuthProvider";
 import { isAdmin } from "../../lib/admin";
+import { useVip } from "../../lib/vip";
 import {
   ageLabel,
   ticketTitle,
@@ -14,38 +15,18 @@ function scrollToPricing() {
   document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function GoldBars() {
+function BrandMark() {
   return (
-    <svg viewBox="0 0 280 180" className="h-full w-full" aria-hidden>
-      <defs>
-        <linearGradient id="bar-face" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#F8E08A" />
-          <stop offset="45%" stopColor="#E2B42A" />
-          <stop offset="100%" stopColor="#8A6A10" />
-        </linearGradient>
-        <linearGradient id="bar-side" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#C4921C" />
-          <stop offset="100%" stopColor="#6B520C" />
-        </linearGradient>
-        <filter id="bar-glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="8" result="b" />
-          <feMerge>
-            <feMergeNode in="b" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      <g filter="url(#bar-glow)" transform="translate(30 28) rotate(-18 110 70)">
-        <rect x="18" y="58" width="170" height="38" rx="8" fill="url(#bar-side)" />
-        <rect x="10" y="42" width="170" height="38" rx="8" fill="url(#bar-face)" />
-        <rect x="28" y="52" width="134" height="4" rx="2" fill="#2A1E05" opacity="0.28" />
-      </g>
-      <g filter="url(#bar-glow)" transform="translate(48 8) rotate(12 110 70)">
-        <rect x="18" y="58" width="170" height="38" rx="8" fill="url(#bar-side)" />
-        <rect x="10" y="42" width="170" height="38" rx="8" fill="url(#bar-face)" />
-        <rect x="28" y="52" width="134" height="4" rx="2" fill="#2A1E05" opacity="0.28" />
-      </g>
-    </svg>
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-0 flex h-[48%] items-end justify-center pb-8"
+    >
+      <img
+        src="/logo-xau.jpg"
+        alt=""
+        className="h-full w-auto max-w-[280px] object-contain opacity-[0.22] [mask-image:radial-gradient(circle,black_40%,transparent_78%)]"
+      />
+    </div>
   );
 }
 
@@ -95,7 +76,8 @@ function OpenRows({ ticket }: { ticket?: Ticket }) {
 
 export function LatestTicket() {
   const { user } = useAuth();
-  const unlocked = isAdmin(user?.email);
+  const vip = useVip(user?.email);
+  const unlocked = isAdmin(user?.email) || vip;
   const { tickets } = useDesk();
   const open = tickets.filter((t) => t.open);
   const featured = open[0];
@@ -151,9 +133,7 @@ export function LatestTicket() {
               {unlocked ? <OpenRows ticket={featured} /> : <LockRows />}
             </div>
 
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[220px]">
-              <GoldBars />
-            </div>
+            <BrandMark />
 
             <span
               className="absolute bottom-6 right-6 z-10 grid h-12 w-12 place-items-center rounded-full bg-white/90 text-[#1A1408] transition hover:bg-white"

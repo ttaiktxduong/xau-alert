@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { useAuth } from "../../components/auth/AuthProvider";
+import { grantVip } from "../../lib/vip";
 
 function DemoInner() {
+  const router = useRouter();
+  const { user } = useAuth();
   const params = useSearchParams();
   const plan = params.get("plan") === "trial" ? "7-day trial" : "Monthly VIP";
   const amount = params.get("amount") || "0";
@@ -44,12 +48,19 @@ function DemoInner() {
                 Full disclaimer
               </Link>
             </div>
-            <Link
-              href="/account?paid=demo"
-              className="mt-6 block rounded-full bg-[#E2B42A] px-5 py-2.5 text-center text-[13px] font-semibold text-[#1A1408]"
+            <button
+              type="button"
+              onClick={() => {
+                grantVip(
+                  params.get("plan") === "trial" ? "trial" : "vip",
+                  user?.email,
+                );
+                router.push("/signals");
+              }}
+              className="mt-6 block w-full rounded-full bg-[#E2B42A] px-5 py-2.5 text-center text-[13px] font-semibold text-[#1A1408]"
             >
               Fake paid (demo only)
-            </Link>
+            </button>
             <Link
               href="/#pricing"
               className="mt-3 block text-center text-[13px] text-white/40 hover:text-white"

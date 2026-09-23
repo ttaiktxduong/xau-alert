@@ -4,9 +4,11 @@ import {
   createContext,
   useCallback,
   useContext,
-  useSyncExternalStore,
+  useEffect,
+  useState,
 } from "react";
 import { ADMIN_PASS, isAdmin, lockDesk } from "../../lib/admin";
+import { getSupabase, hasSupabase } from "../../lib/supabase";
 
 export type DeskUser = {
   name: string;
@@ -18,14 +20,13 @@ type StoredUser = DeskUser & { password: string };
 type AuthContextValue = {
   user: DeskUser | null;
   ready: boolean;
-  login: (email: string, password: string) => string | null;
-  signup: (name: string, email: string, password: string) => string | null;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<string | null>;
+  signup: (name: string, email: string, password: string) => Promise<string | null>;
+  logout: () => Promise<void>;
 };
 
 const SESSION_KEY = "xau-alert-user";
 const USERS_KEY = "xau-alert-users";
-const AUTH_EVENT = "xau-auth";
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 function readUsers(): StoredUser[] {
@@ -36,74 +37,81 @@ function readUsers(): StoredUser[] {
   }
 }
 
-let cachedRaw: string | null | undefined;
-let cachedUser: DeskUser | null = null;
-
-function getServerSession(): DeskUser | null {
-  return null;
-}
-
-function readSession(): DeskUser | null {
+function readLocalSession(): DeskUser | null {
   try {
     const raw = localStorage.getItem(SESSION_KEY);
-    if (raw === cachedRaw) return cachedUser;
-    cachedRaw = raw;
-    cachedUser = raw ? (JSON.parse(raw) as DeskUser) : null;
-    return cachedUser;
+    return raw ? (JSON.parse(raw) as DeskUser) : null;
   } catch {
-    cachedRaw = null;
-    cachedUser = null;
     return null;
   }
 }
 
-function subscribe(onStoreChange: () => void) {
-  const handler = () => onStoreChange();
-  window.addEventListener(AUTH_EVENT, handler);
-  window.addEventListener("storage", handler);
-  return () => {
-    window.removeEventListener(AUTH_EVENT, handler);
-    window.removeEventListener("storage", handler);
-  };
-}
-
-function writeSession(next: DeskUser | null) {
-  if (next) {
-    const raw = JSON.stringify(next);
-    localStorage.setItem(SESSION_KEY, raw);
-    cachedRaw = raw;
-    cachedUser = next;
-  } else {
-    localStorage.removeItem(SESSION_KEY);
-    cachedRaw = null;
-    cachedUser = null;
-  }
-  window.dispatchEvent(new Event(AUTH_EVENT));
-}
-
-function subscribeReady() {
-  return () => {};
-}
-function clientReady() {
-  return true;
-}
-function serverReady() {
-  return false;
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const ready = useSyncExternalStore(subscribeReady, clientReady, serverReady);
-  const user = useSyncExternalStore(subscribe, readSession, getServerSession);
+  const cloud = hasSupabase();
+  const [user, setUser] = useState<DeskUser | null>(null);
+  const [ready, setReady] = useState(false);
 
-  const login = useCallback((email: string, password: string) => {
+  useEffect(() => {
+    const sb = getSupabase();
+    if (!sb) {
+      const local = readLocalSession();
+      const timer = window.setTimeout(() => {
+        setUser(local);
+        setReady(true);
+      }, 0);
+      return () => window.clearTimeout(timer);
+    }
+    let alive = true;
+    sb.auth.getSession().then(({ data }) => {
+      if (!alive) return;
+      const session = data.session;
+      setUser(
+        session?.user.email
+          ? {
+              email: session.user.email,
+              name:
+                (session.user.user_metadata?.name as string) ||
+                session.user.email.split("@")[0],
+            }
+          : null,
+      );
+      setReady(true);
+    });
+    const { data: sub } = sb.auth.onAuthStateChange((_event, session) => {
+      setUser(
+        session?.user.email
+          ? {
+              email: session.user.email,
+              name:
+                (session.user.user_metadata?.name as string) ||
+                session.user.email.split("@")[0],
+            }
+          : null,
+      );
+    });
+    return () => {
+      alive = false;
+      sub.subscription.unsubscribe();
+    };
+  }, [cloud]);
+
+  const login = useCallback(async (email: string, password: string) => {
+    const sb = getSupabase();
+    if (sb) {
+      const { error } = await sb.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (error) return error.message;
+      return null;
+    }
     if (isAdmin(email) && password === ADMIN_PASS) {
       const found = readUsers().find(
         (item) => item.email.toLowerCase() === email.toLowerCase(),
       );
-      writeSession({
-        name: found?.name || "Desk",
-        email: email.trim(),
-      });
+      const next = { name: found?.name || "Desk", email: email.trim() };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(next));
+      setUser(next);
       return null;
     }
     const found = readUsers().find(
@@ -111,29 +119,49 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
     if (!found) return "No account for this email. Create one first.";
     if (found.password !== password) return "Wrong password.";
-    writeSession({ name: found.name, email: found.email });
+    const next = { name: found.name, email: found.email };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(next));
+    setUser(next);
     return null;
   }, []);
 
-  const signup = useCallback((name: string, email: string, password: string) => {
-    if (password.length < 6) return "Password must be at least 6 characters.";
-    const users = readUsers();
-    if (users.some((item) => item.email.toLowerCase() === email.toLowerCase())) {
-      return "Email already registered. Sign in instead.";
-    }
-    const record: StoredUser = {
-      name: name.trim() || email.split("@")[0],
-      email,
-      password,
-    };
-    localStorage.setItem(USERS_KEY, JSON.stringify([...users, record]));
-    writeSession({ name: record.name, email: record.email });
-    return null;
-  }, []);
+  const signup = useCallback(
+    async (name: string, email: string, password: string) => {
+      if (password.length < 6) return "Password must be at least 6 characters.";
+      const sb = getSupabase();
+      if (sb) {
+        const { error } = await sb.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { data: { name: name.trim() || email.split("@")[0] } },
+        });
+        if (error) return error.message;
+        return null;
+      }
+      const users = readUsers();
+      if (users.some((item) => item.email.toLowerCase() === email.toLowerCase())) {
+        return "Email already registered. Sign in instead.";
+      }
+      const record: StoredUser = {
+        name: name.trim() || email.split("@")[0],
+        email,
+        password,
+      };
+      localStorage.setItem(USERS_KEY, JSON.stringify([...users, record]));
+      const next = { name: record.name, email: record.email };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(next));
+      setUser(next);
+      return null;
+    },
+    [],
+  );
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     lockDesk();
-    writeSession(null);
+    const sb = getSupabase();
+    if (sb) await sb.auth.signOut();
+    localStorage.removeItem(SESSION_KEY);
+    setUser(null);
   }, []);
 
   return (
@@ -146,9 +174,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 const FALLBACK: AuthContextValue = {
   user: null,
   ready: true,
-  login: () => "Auth is not ready.",
-  signup: () => "Auth is not ready.",
-  logout: () => {},
+  login: async () => "Auth is not ready.",
+  signup: async () => "Auth is not ready.",
+  logout: async () => {},
 };
 
 export function useAuth() {

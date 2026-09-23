@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 const DESK = [
@@ -19,17 +18,15 @@ export function Footer() {
       <div className="mx-auto grid max-w-[1240px] gap-12 px-6 py-14 md:grid-cols-[1.5fr_1fr_1fr]">
         <div>
           <Link href="/" className="flex items-center gap-2.5">
-            <Image
+            <img
               src="/logo-xau.jpg"
-              alt="XAU Alert"
-              width={36}
-              height={36}
-              className="h-9 w-9 rounded-lg object-contain"
+              alt="XAU Classic"
+              className="h-9 w-9 rounded-lg object-cover"
             />
             <span className="flex items-baseline gap-1.5">
               <span className="text-[17px] font-semibold tracking-wide text-white">XAU</span>
               <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E2B42A]">
-                Alert
+                Classic
               </span>
             </span>
           </Link>

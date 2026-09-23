@@ -14,16 +14,16 @@ export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
     const email = String(data.get("email") || "");
-    const err = login(email, String(data.get("password") || ""));
+    const err = await login(email, String(data.get("password") || ""));
     if (err) {
       setError(err);
       return;
     }
-    router.push(isAdmin(email) ? "/admin" : "/account");
+    router.push(isAdmin(email) ? "/admin" : "/");
   }
 
   return (

@@ -14,11 +14,11 @@ export default function SignupPage() {
   const router = useRouter();
   const [error, setError] = useState("");
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
     const email = String(data.get("email") || "");
-    const err = signup(
+    const err = await signup(
       String(data.get("name") || ""),
       email,
       String(data.get("password") || ""),
@@ -27,7 +27,7 @@ export default function SignupPage() {
       setError(err);
       return;
     }
-    router.push(isAdmin(email) ? "/admin" : "/account");
+    router.push(isAdmin(email) ? "/admin" : "/");
   }
 
   return (

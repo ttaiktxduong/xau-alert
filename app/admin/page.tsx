@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Inbox } from "../components/admin/Inbox";
 import { useAuth } from "../components/auth/AuthProvider";
 import { deskUnlocked, isAdmin, lockDesk, unlockDesk } from "../lib/admin";
 import {
@@ -163,6 +164,8 @@ export default function AdminPage() {
             Nhập ticket tại đây. Home, Signals, chuông và Ledger đọc cùng một
             nguồn localStorage — demo trên trình duyệt này.
           </p>
+
+          <Inbox />
 
           <form
             onSubmit={onCreate}

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { NotificationBell } from "./NotificationBell";
 import { isAdmin } from "../../lib/admin";
+import { roleLabel, useRole } from "../../lib/roles";
 
 const NAV: { href: string; label: string }[] = [
   { href: "/", label: "Home" },
@@ -25,7 +26,8 @@ export function Header() {
   const { user, ready } = useAuth();
   const [open, setOpen] = useState(false);
   const chipLabel = user?.name?.split(" ")[0] || user?.email?.split("@")[0] || "Guest";
-  const desk = Boolean(user && isAdmin(user.email));
+  const role = useRole(user?.email);
+  const desk = role === "admin";
   const items: { href: string; label: string }[] = desk
     ? [...NAV.filter((item) => item.href !== "/support"), { href: "/admin", label: "Admin" }]
     : NAV;
@@ -51,11 +53,11 @@ export function Header() {
             className="relative z-10 flex h-11 shrink-0 items-center gap-2.5 rounded-full pl-1 pr-2"
             onClick={() => setOpen(false)}
           >
-            <img src="/logo-xau.jpg" alt="" className="h-8 w-8 rounded-lg object-contain" />
+            <img src="/logo-xau.jpg" alt="" className="h-9 w-9 rounded-lg object-cover" />
             <span className="flex items-baseline gap-1.5 leading-none">
               <span className="text-[17px] font-semibold tracking-wide">XAU</span>
               <span className="hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E2B42A] sm:inline">
-                Alert
+                Classic
               </span>
             </span>
           </Link>
@@ -91,6 +93,11 @@ export function Header() {
                   {chipLabel.charAt(0).toUpperCase()}
                 </span>
                 <span className="max-w-24 truncate">{chipLabel}</span>
+                {role === "admin" || role === "vip" ? (
+                  <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#E2B42A]">
+                    {roleLabel(role)}
+                  </span>
+                ) : null}
               </Link>
             ) : (
               <>
