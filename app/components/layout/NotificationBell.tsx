@@ -49,7 +49,7 @@ export function NotificationBell() {
       </button>
 
       {open ? (
-        <div className="absolute right-0 top-[calc(100%+12px)] z-50 w-[min(360px,calc(100vw-2rem))] overflow-hidden rounded-[24px] border border-white/10 bg-[#121212] shadow-[0_24px_80px_rgba(0,0,0,0.55)]">
+        <div className="fixed inset-x-3 top-[4.6rem] z-[80] max-h-[min(70vh,420px)] overflow-hidden rounded-[24px] border border-white/10 bg-[#121212] shadow-[0_24px_80px_rgba(0,0,0,0.55)] sm:absolute sm:inset-x-auto sm:right-0 sm:top-[calc(100%+12px)] sm:w-[360px]">
           <div className="flex items-center justify-between px-4 py-3">
             <p className="text-[13px] font-semibold text-white">Notifications</p>
             {unread > 0 ? (

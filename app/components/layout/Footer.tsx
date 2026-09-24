@@ -15,8 +15,8 @@ export function Footer() {
   return (
     <footer className="relative z-10 bg-[#050505]">
       <div className="h-[2px] w-full bg-[#E2B42A]" />
-      <div className="mx-auto grid max-w-[1240px] gap-12 px-6 py-14 md:grid-cols-[1.5fr_1fr_1fr]">
-        <div>
+      <div className="mx-auto grid max-w-[1240px] grid-cols-2 gap-x-8 gap-y-10 px-6 py-14 md:grid-cols-[1.5fr_1fr_1fr]">
+        <div className="col-span-2 md:col-span-1">
           <Link href="/" className="flex items-center gap-2.5">
             <img
               src="/logo-xau.jpg"
