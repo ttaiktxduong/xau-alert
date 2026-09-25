@@ -57,7 +57,7 @@ export function Header() {
             <span className="flex items-baseline gap-1.5 leading-none">
               <span className="text-[17px] font-semibold tracking-wide">XAU</span>
               <span className="hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E2B42A] sm:inline">
-                Classic
+                Alert
               </span>
             </span>
           </Link>

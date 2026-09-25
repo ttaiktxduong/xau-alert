@@ -25,8 +25,8 @@ function DemoInner() {
             Test checkout
           </h1>
           <p className="mt-2 text-sm leading-6 text-white/50">
-            Chưa gắn Merchant ID / Payment key nên đây là trang giả. Live sẽ
-            mở pay.heleket.com để khách chọn coin.
+            Merchant ID and payment key are missing, so this is a demo page.
+            Live checkout opens pay.heleket.com so the client can pick a coin.
           </p>
           <div className="mt-8 rounded-[28px] bg-[#121212] p-6 ring-1 ring-white/[0.06]">
             <p className="text-sm text-white/45">{plan}</p>

@@ -74,7 +74,7 @@ export function Pricing() {
         </p>
         {desk ? (
           <p className="mb-5 text-sm text-white/40">
-            Preview only — admin does not checkout. Giá và giảm giá chỉnh sau trong Admin.
+            Preview only. Admin does not checkout. Prices can be edited in Admin later.
           </p>
         ) : null}
 
@@ -176,7 +176,7 @@ export function Pricing() {
                     {left === 1 ? "day left" : "days left"}
                   </span>
                 </p>
-                <p className="mt-2 text-xs text-white/35">Hết hạn {until}</p>
+                <p className="mt-2 text-xs text-white/35">Expires {until}</p>
               </div>
               <button
                 type="button"
@@ -187,7 +187,7 @@ export function Pricing() {
                 {busy
                   ? "Opening Heleket…"
                   : renewing
-                    ? `Gia hạn $${selected.price}`
+                    ? `Renew $${selected.price}`
                     : `Pay $${selected.price}`}
               </button>
             </div>
@@ -220,7 +220,7 @@ export function Pricing() {
             {error ? <p className="mt-3 text-xs text-[#E35A5A]">{error}</p> : null}
             <p className="mt-3 text-xs text-white/35">
               {user
-                ? "Opens Heleket. Pay in USD amount — choose any supported coin on their page."
+                ? "Opens Heleket. Pay the USD amount and choose any supported coin on their page."
                 : "Sign in first, then pay on Heleket."}
             </p>
           </div>

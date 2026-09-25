@@ -82,7 +82,7 @@ export default function AdminPage() {
               Admin pass
             </h1>
             <p className="mt-2 text-sm text-white/50">
-              Email admin chưa đủ. Nhập mật khẩu desk mới được sửa ticket.
+              Admin email is not enough. Enter the desk password to edit tickets.
             </p>
             <form
               className="mt-8 rounded-[28px] bg-[#121212] p-6 ring-1 ring-white/[0.06]"
@@ -161,8 +161,8 @@ export default function AdminPage() {
             Admin
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-white/50">
-            Nhập ticket tại đây. Home, Signals, chuông và Ledger đọc cùng một
-            nguồn localStorage — demo trên trình duyệt này.
+            Publish tickets here. Home, Signals, the bell and the ledger read
+            the same desk store. Demo data stays in this browser.
           </p>
 
           <Inbox />

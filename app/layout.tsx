@@ -8,6 +8,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "XAU Alert",
   description: "XAUUSD signal tickets. Not financial advice.",
+  icons: {
+    icon: "/logo-xau.jpg",
+    shortcut: "/logo-xau.jpg",
+    apple: "/logo-xau.jpg",
+  },
 };
 
 export default function RootLayout({
@@ -22,7 +27,7 @@ export default function RootLayout({
         <div className="relative z-10 flex min-h-screen flex-col">
           <Providers>
             <Header />
-            <main className="flex-1 bg-transparent">{children}</main>
+            <main className="flex-1 bg-[#050505]">{children}</main>
             <Footer />
           </Providers>
         </div>

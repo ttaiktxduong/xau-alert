@@ -1,9 +1,9 @@
 // Chỉ email này mới thấy menu Admin.
-export const ADMIN_EMAILS = ["thegrindchronicle.contact@gmail.com"];
+export const ADMIN_EMAILS = ["howopus1@gmail.com"];
 
 // Đổi chuỗi này thành mật khẩu desk của bạn.
 // Cần nhập lại mỗi phiên — không chỉ biết email là sửa được.
-export const ADMIN_PASS = "matkhaucuaban";
+export const ADMIN_PASS = "change-this-desk-pass";
 
 const UNLOCK_KEY = "xau-desk-unlock";
 

@@ -213,7 +213,7 @@ export function LatestTicket() {
               </span>
             </div>
             <p className="relative z-10 mt-4 max-w-md text-[14px] leading-6 text-white/50">
-              Closed plan shown as social proof of execution — mock data, not a
+              Closed plan shown as social proof of execution, mock data, not a
               live guarantee.
             </p>
           </Link>

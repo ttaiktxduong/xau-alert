@@ -38,7 +38,7 @@ export default function SupportPage() {
                     Email
                   </p>
                   <p className="relative mt-3 text-[18px] font-medium text-white">
-                    thegrindchronicle.contact@gmail.com
+                    howopus1@gmail.com
                   </p>
                   <p className="relative mt-2 text-sm leading-6 text-white/45">
                     Billing and access only.

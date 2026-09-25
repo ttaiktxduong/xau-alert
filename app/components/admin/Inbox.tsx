@@ -31,7 +31,7 @@ export function Inbox() {
   if (!hasSupabase()) {
     return (
       <p className="mt-6 text-sm text-white/35">
-        Chưa gắn Supabase — tin Support chỉ hiện sau khi thêm URL + anon key.
+        Supabase is not connected. Support mail appears here after you add the URL and anon key.
       </p>
     );
   }
@@ -43,7 +43,7 @@ export function Inbox() {
       </p>
       {error ? <p className="mt-3 text-sm text-[#E35A5A]">{error}</p> : null}
       {rows.length === 0 && !error ? (
-        <p className="mt-3 text-sm text-white/40">Chưa có tin nhắn.</p>
+        <p className="mt-3 text-sm text-white/40">No messages yet.</p>
       ) : (
         <ul className="mt-4 space-y-3">
           {rows.map((row) => (

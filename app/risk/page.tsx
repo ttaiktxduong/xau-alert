@@ -111,7 +111,7 @@ export default function RiskPage() {
               Trading XAUUSD involves risk of loss, including loss of capital.
               Published tickets are educational execution notes. Past pips on
               this desk are mock / demo unless marked live. You size and click
-              the order — we do not manage your account.
+              the order. We do not manage your account.
             </p>
             <Link
               href="/legal"

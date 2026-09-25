@@ -20,13 +20,13 @@ export function Footer() {
           <Link href="/" className="flex items-center gap-2.5">
             <img
               src="/logo-xau.jpg"
-              alt="XAU Classic"
+              alt="XAU Alert"
               className="h-9 w-9 rounded-lg object-cover"
             />
             <span className="flex items-baseline gap-1.5">
               <span className="text-[17px] font-semibold tracking-wide text-white">XAU</span>
               <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E2B42A]">
-                Classic
+                Alert
               </span>
             </span>
           </Link>
