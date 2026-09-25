@@ -37,7 +37,7 @@ export default function LoginPage() {
             Sign in
           </h1>
           <p className="mt-2 text-sm text-white/50">
-            Use the account you created on this browser.
+            Use the email and password from your account.
           </p>
 
           {user ? (
