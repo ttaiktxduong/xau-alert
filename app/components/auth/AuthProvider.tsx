@@ -7,15 +7,13 @@ import {
   useEffect,
   useState,
 } from "react";
-import { ADMIN_PASS, isAdmin, lockDesk } from "../../lib/admin";
-import { getSupabase, hasSupabase } from "../../lib/supabase";
+import { lockDesk } from "../../lib/admin";
+import { getSupabase } from "../../lib/supabase";
 
 export type DeskUser = {
   name: string;
   email: string;
 };
-
-type StoredUser = DeskUser & { password: string };
 
 type AuthContextValue = {
   user: DeskUser | null;
@@ -25,132 +23,84 @@ type AuthContextValue = {
   logout: () => Promise<void>;
 };
 
-const SESSION_KEY = "xau-alert-user";
-const USERS_KEY = "xau-alert-users";
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function readUsers(): StoredUser[] {
-  try {
-    return JSON.parse(localStorage.getItem(USERS_KEY) || "[]") as StoredUser[];
-  } catch {
-    return [];
-  }
+function fromSession(session: {
+  user?: { email?: string | null; user_metadata?: { name?: string } };
+} | null): DeskUser | null {
+  const email = session?.user?.email;
+  if (!email) return null;
+  return {
+    email,
+    name: session?.user?.user_metadata?.name || email.split("@")[0],
+  };
 }
 
-function readLocalSession(): DeskUser | null {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    return raw ? (JSON.parse(raw) as DeskUser) : null;
-  } catch {
-    return null;
-  }
+async function saveProfile(
+  id: string,
+  email: string,
+  name: string,
+) {
+  const sb = getSupabase();
+  if (!sb) return;
+  await sb.from("profiles").upsert({
+    id,
+    email: email.trim().toLowerCase(),
+    name: name.trim() || email.split("@")[0],
+  });
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const cloud = hasSupabase();
   const [user, setUser] = useState<DeskUser | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const sb = getSupabase();
     if (!sb) {
-      const local = readLocalSession();
-      const timer = window.setTimeout(() => {
-        setUser(local);
-        setReady(true);
-      }, 0);
+      const timer = window.setTimeout(() => setReady(true), 0);
       return () => window.clearTimeout(timer);
     }
     let alive = true;
     sb.auth.getSession().then(({ data }) => {
       if (!alive) return;
-      const session = data.session;
-      setUser(
-        session?.user.email
-          ? {
-              email: session.user.email,
-              name:
-                (session.user.user_metadata?.name as string) ||
-                session.user.email.split("@")[0],
-            }
-          : null,
-      );
+      setUser(fromSession(data.session));
       setReady(true);
     });
     const { data: sub } = sb.auth.onAuthStateChange((_event, session) => {
-      setUser(
-        session?.user.email
-          ? {
-              email: session.user.email,
-              name:
-                (session.user.user_metadata?.name as string) ||
-                session.user.email.split("@")[0],
-            }
-          : null,
-      );
+      setUser(fromSession(session));
     });
     return () => {
       alive = false;
       sub.subscription.unsubscribe();
     };
-  }, [cloud]);
+  }, []);
 
   const login = useCallback(async (email: string, password: string) => {
     const sb = getSupabase();
-    if (sb) {
-      const { error } = await sb.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      if (error) return error.message;
-      return null;
-    }
-    if (isAdmin(email) && password === ADMIN_PASS) {
-      const found = readUsers().find(
-        (item) => item.email.toLowerCase() === email.toLowerCase(),
-      );
-      const next = { name: found?.name || "Desk", email: email.trim() };
-      localStorage.setItem(SESSION_KEY, JSON.stringify(next));
-      setUser(next);
-      return null;
-    }
-    const found = readUsers().find(
-      (item) => item.email.toLowerCase() === email.toLowerCase(),
-    );
-    if (!found) return "No account for this email. Create one first.";
-    if (found.password !== password) return "Wrong password.";
-    const next = { name: found.name, email: found.email };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(next));
-    setUser(next);
-    return null;
+    if (!sb) return "Account server is not connected.";
+    const { error } = await sb.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+    return error ? error.message : null;
   }, []);
 
   const signup = useCallback(
     async (name: string, email: string, password: string) => {
       if (password.length < 6) return "Password must be at least 6 characters.";
       const sb = getSupabase();
-      if (sb) {
-        const { error } = await sb.auth.signUp({
-          email: email.trim(),
-          password,
-          options: { data: { name: name.trim() || email.split("@")[0] } },
-        });
-        if (error) return error.message;
-        return null;
-      }
-      const users = readUsers();
-      if (users.some((item) => item.email.toLowerCase() === email.toLowerCase())) {
-        return "Email already registered. Sign in instead.";
-      }
-      const record: StoredUser = {
-        name: name.trim() || email.split("@")[0],
-        email,
+      if (!sb) return "Account server is not connected.";
+      const cleanEmail = email.trim();
+      const cleanName = name.trim() || cleanEmail.split("@")[0];
+      const { data, error } = await sb.auth.signUp({
+        email: cleanEmail,
         password,
-      };
-      localStorage.setItem(USERS_KEY, JSON.stringify([...users, record]));
-      const next = { name: record.name, email: record.email };
-      localStorage.setItem(SESSION_KEY, JSON.stringify(next));
-      setUser(next);
+        options: { data: { name: cleanName } },
+      });
+      if (error) return error.message;
+      if (data.user?.id) {
+        await saveProfile(data.user.id, cleanEmail, cleanName);
+      }
       return null;
     },
     [],
@@ -160,7 +110,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     lockDesk();
     const sb = getSupabase();
     if (sb) await sb.auth.signOut();
-    localStorage.removeItem(SESSION_KEY);
     setUser(null);
   }, []);
 

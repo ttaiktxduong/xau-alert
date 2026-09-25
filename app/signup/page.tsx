@@ -41,7 +41,7 @@ export default function SignupPage() {
             Create account
           </h1>
           <p className="mt-2 text-sm text-white/50">
-            Create an account, saved in this browser only.
+            Saved on the account server. Use this email to sign in on any device.
           </p>
 
           <form

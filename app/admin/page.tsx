@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Inbox } from "../components/admin/Inbox";
+import { Members } from "../components/admin/Members";
 import { useAuth } from "../components/auth/AuthProvider";
 import { deskUnlocked, isAdmin, lockDesk, unlockDesk } from "../lib/admin";
 import {
@@ -165,6 +166,7 @@ export default function AdminPage() {
             the same desk store. Demo data stays in this browser.
           </p>
 
+          <Members />
           <Inbox />
 
           <form
