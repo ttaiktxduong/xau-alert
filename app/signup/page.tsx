@@ -41,7 +41,7 @@ export default function SignupPage() {
             Create account
           </h1>
           <p className="mt-2 text-sm text-white/50">
-            Demo signup, saved in this browser only.
+            Create an account, saved in this browser only.
           </p>
 
           <form
