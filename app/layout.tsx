@@ -6,8 +6,8 @@ import { Atmosphere } from "./components/layout/Atmosphere";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "XAU Alert",
-  description: "XAUUSD signal tickets. Not financial advice.",
+  title: "Cfdaurix",
+  description: "Cfdaurix gold signal tickets. Not financial advice.",
   icons: {
     icon: "/logo-xau.jpg",
     shortcut: "/logo-xau.jpg",

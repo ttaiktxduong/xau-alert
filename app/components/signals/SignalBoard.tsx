@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
-import { isAdmin } from "../../lib/admin";
-import { useVip } from "../../lib/vip";
+import { useTicketAccess } from "../../lib/access";
 import {
   ageLabel,
   ticketTitle,
@@ -67,8 +66,7 @@ function OpenRows({ ticket }: { ticket: Ticket }) {
 export function SignalBoard() {
   const [filter, setFilter] = useState<Filter>("all");
   const { user } = useAuth();
-  const vip = useVip(user?.email);
-  const unlocked = isAdmin(user?.email) || vip;
+  const { unlocked } = useTicketAccess(user?.email);
   const { tickets } = useDesk();
 
   const rows = useMemo(() => {
@@ -88,7 +86,7 @@ export function SignalBoard() {
             <div>
               <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#E2B42A]" />
-                Live XAU/USD signals
+                Live gold signals
               </p>
               <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-white md:text-4xl">
                 Signal desk
@@ -129,7 +127,7 @@ export function SignalBoard() {
                   <div className="relative flex items-start justify-between">
                     <div>
                       <p className="text-[12px] text-white/40">
-                        {t.pair} · {ageLabel(t.createdAt)}
+                        GOLD · {ageLabel(t.createdAt)}
                       </p>
                       <p className="mt-2 text-[22px] font-semibold capitalize tracking-[-0.03em] text-white">
                         {ticketTitle(t)}

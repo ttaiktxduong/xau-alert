@@ -7,6 +7,10 @@ export type Setup = "limit" | "market";
 export type Result = "Hit TP1" | "Hit TP2" | "Hit TP3" | "Stopped" | "Canceled";
 export type Period = "Day" | "Week" | "Month" | "Quarter" | "Year";
 
+export function pairLabel(_pair?: string) {
+  return "GOLD";
+}
+
 export type Ticket = {
   id: string;
   pair: "XAU/USD";
@@ -179,7 +183,7 @@ const SEED_NOTES: Note[] = [
   {
     id: "n1",
     title: "New SELL LIMIT",
-    body: "XAU/USD plan published. Entry and SL locked for VIP.",
+    body: "Gold plan published. Entry and SL locked for VIP.",
     href: "/signals",
     createdAt: now - 5 * m,
     unread: true,
@@ -187,7 +191,7 @@ const SEED_NOTES: Note[] = [
   {
     id: "n2",
     title: "New BUY LIMIT",
-    body: "XAU/USD plan published. Unlock to read the zone.",
+    body: "Gold plan published. Unlock to read the zone.",
     href: "/signals",
     createdAt: now - 12 * m,
     unread: true,
@@ -351,7 +355,7 @@ export function addTicket(input: NewTicket) {
   const note: Note = {
     id: uid("n"),
     title: `New ${ticket.side.toUpperCase()} ${ticket.setup.toUpperCase()}`,
-    body: "XAU/USD plan published. Entry and SL locked for VIP.",
+    body: "Gold plan published. Entry and SL locked for VIP.",
     href: "/signals",
     createdAt: ticket.createdAt,
     unread: true,

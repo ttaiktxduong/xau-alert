@@ -11,7 +11,7 @@ export function Hero() {
             <span className="text-white">disciplined execution</span>
           </h1>
           <p className="mt-6 max-w-xl text-[16px] leading-7 text-white/60">
-            Real-time XAU/USD trading plans built for disciplined execution.
+            Realtime gold trading plans built for disciplined execution.
             Signals, invalidation, and performance, without profit promises.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
@@ -34,7 +34,7 @@ export function Hero() {
           <article className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0b0b0b]/90 p-5 shadow-[0_30px_80px_rgba(0,0,0,0.55)] backdrop-blur-sm">
             <div className="flex items-center justify-between rounded-2xl bg-white/5 px-4 py-3">
               <div>
-                <p className="text-[15px] font-medium text-white">Live XAU/USD plan</p>
+                <p className="text-[15px] font-medium text-white">Live gold plan</p>
                 <p className="mt-0.5 text-[12px] text-white/40">Entry zone locked until VIP</p>
               </div>
               <span className="grid h-10 w-10 place-items-center rounded-full bg-[#E2B42A] text-[13px] font-bold text-[#1A1408]">
@@ -61,7 +61,7 @@ export function Hero() {
 
             <div className="mt-2 text-center">
               <p className="text-[28px] font-semibold tracking-tight text-white">BUY LIMIT</p>
-              <p className="mt-1 text-[13px] text-white/40">New plan · demo ticket</p>
+              <p className="mt-1 text-[13px] text-white/40">New plan</p>
             </div>
           </article>
         </div>

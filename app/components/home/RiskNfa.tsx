@@ -3,11 +3,11 @@ import Link from "next/link";
 const RULES = [
   {
     title: "Risk per trade",
-    body: "Keep risk at or below 0.5%–1% per plan.",
+    body: "Keep risk at or below 0.5% to 1% per plan.",
   },
   {
     title: "Maximum exposure",
-    body: "Do not stack correlated XAU positions.",
+    body: "Do not stack correlated gold positions.",
   },
   {
     title: "Stop loss discipline",
@@ -76,7 +76,7 @@ export function RiskNfa() {
 
         <div className="mt-10 flex flex-col gap-3 border-t border-white/8 pt-6 md:flex-row md:items-center md:justify-between">
           <p className="max-w-xl text-sm leading-6 text-white/40">
-            Trading XAUUSD involves risk of loss. Published tickets are not
+            Trading gold involves risk of loss. Published tickets are not
             financial advice. This is not a live guarantee of results.
           </p>
           <Link

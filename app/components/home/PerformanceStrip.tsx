@@ -62,7 +62,7 @@ export function PerformanceStrip() {
               {pipsLabel(s.pips)}
             </p>
             <p className="relative mt-2 text-xs text-white/40">
-              Mock / demo track record — not a live feed
+              Track record. Not a live broker feed.
             </p>
           </div>
 

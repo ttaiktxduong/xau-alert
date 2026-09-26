@@ -163,7 +163,7 @@ export default function AdminPage() {
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-6 text-white/50">
             Publish tickets here. Home, Signals, the bell and the ledger read
-            the same desk store. Demo data stays in this browser.
+            the same desk store.
           </p>
 
           <Members />
@@ -254,7 +254,7 @@ export default function AdminPage() {
                 onClick={() => resetDesk()}
                 className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/35 hover:text-white"
               >
-                Reset demo
+                Reset desk
               </button>
               <button
                 type="button"
@@ -279,7 +279,7 @@ export default function AdminPage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-[12px] text-white/40">
-                      {t.pair} · {ageLabel(t.createdAt)}
+                      GOLD · {ageLabel(t.createdAt)}
                     </p>
                     <p className="mt-1 text-[18px] font-semibold capitalize">
                       {ticketTitle(t)}

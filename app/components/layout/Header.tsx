@@ -53,12 +53,10 @@ export function Header() {
             className="relative z-10 flex h-11 shrink-0 items-center gap-2.5 rounded-full pl-1 pr-2"
             onClick={() => setOpen(false)}
           >
-            <img src="/logo-xau.jpg" alt="" className="h-9 w-9 rounded-lg object-cover" />
-            <span className="flex items-baseline gap-1.5 leading-none">
-              <span className="text-[17px] font-semibold tracking-wide">XAU</span>
-              <span className="hidden text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E2B42A] sm:inline">
-                Alert
-              </span>
+            <img src="/logo-xau.jpg" alt="Cfdaurix" className="h-9 w-9 rounded-lg object-cover" />
+            <span className="flex items-baseline gap-1 leading-none">
+              <span className="text-[17px] font-semibold tracking-wide">Cfd</span>
+              <span className="text-[17px] font-semibold tracking-wide text-[#E2B42A]">aurix</span>
             </span>
           </Link>
 

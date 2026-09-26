@@ -101,7 +101,7 @@ export function Pricing() {
                 <span className="ml-2 text-base font-normal text-white/40">/ 7 days</span>
               </p>
               <ul className="mt-6 space-y-2.5 text-[14px] text-white/55">
-                <li>Live XAU/USD signals</li>
+                <li>Live gold signals</li>
                 <li>Entry zones · Stop loss · TP1/2/3</li>
                 <li>Telegram support</li>
               </ul>
@@ -146,7 +146,7 @@ export function Pricing() {
                 <span className="ml-2 text-base font-normal text-white/40">/ month</span>
               </p>
               <ul className="mt-6 space-y-2.5 text-[14px] text-white/55">
-                <li>Live XAU/USD signals</li>
+                <li>Live gold signals</li>
                 <li>Entry · SL · TP1 / TP2 / TP3</li>
                 <li>Trading plans + performance tracking</li>
                 <li>Telegram support</li>

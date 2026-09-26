@@ -3,7 +3,7 @@ import Link from "next/link";
 const SECTIONS = [
   {
     title: "Not financial advice",
-    body: "XAU Alert publishes gold (XAUUSD) execution tickets for educational use. Nothing on this site is a recommendation to buy or sell any instrument. You are solely responsible for every order you place.",
+    body: "Cfdaurix publishes gold execution tickets for educational use. Nothing on this site is a recommendation to buy or sell any instrument. You are solely responsible for every order you place.",
   },
   {
     title: "Risk of loss",
@@ -15,11 +15,11 @@ const SECTIONS = [
   },
   {
     title: "Performance figures",
-    body: "Pips, winrate, and closed-ticket tables on this desk may be mock or demo until marked as a live audited feed. Past results do not predict future results. Screenshots and ledger rows are not a guarantee.",
+    body: "Pips, winrate, and closed ticket tables on this desk are not a live audited feed unless marked as such. Past results do not predict future results. Screenshots and ledger rows are not a guarantee.",
   },
   {
     title: "No account management",
-    body: "We do not place trades for you, hold your funds, or act as a broker, advisor, or portfolio manager. Access plans (trial / VIP) buy visibility of tickets and support — not a managed result.",
+    body: "We do not place trades for you, hold your funds, or act as a broker, advisor, or portfolio manager. Access plans (trial / VIP) buy visibility of tickets and support, not a managed result.",
   },
   {
     title: "Your obligations",

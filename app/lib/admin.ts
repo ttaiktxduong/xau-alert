@@ -3,7 +3,7 @@ export const ADMIN_EMAILS = ["howopus1@gmail.com"];
 
 // Đổi chuỗi này thành mật khẩu desk của bạn.
 // Cần nhập lại mỗi phiên — không chỉ biết email là sửa được.
-export const ADMIN_PASS = "change-this-desk-pass";
+export const ADMIN_PASS = "matkhaucuaban";
 
 const UNLOCK_KEY = "xau-desk-unlock";
 

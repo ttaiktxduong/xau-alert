@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "../auth/AuthProvider";
-import { isAdmin } from "../../lib/admin";
-import { useVip } from "../../lib/vip";
+import { useTicketAccess } from "../../lib/access";
 import {
   ageLabel,
   ticketTitle,
@@ -76,8 +75,7 @@ function OpenRows({ ticket }: { ticket?: Ticket }) {
 
 export function LatestTicket() {
   const { user } = useAuth();
-  const vip = useVip(user?.email);
-  const unlocked = isAdmin(user?.email) || vip;
+  const { unlocked } = useTicketAccess(user?.email);
   const { tickets } = useDesk();
   const open = tickets.filter((t) => t.open);
   const featured = open[0];
@@ -90,7 +88,7 @@ export function LatestTicket() {
         <div className="mb-5 flex items-center justify-between">
           <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
             <span className="h-1.5 w-1.5 rounded-full bg-[#E2B42A]" />
-            Live XAU/USD signals
+            Live gold signals
           </p>
           <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/30">
             Desk feed
@@ -114,7 +112,7 @@ export function LatestTicket() {
             <div className="relative z-10 flex items-start justify-between">
               <div>
                 <p className="text-[13px] text-white/45">
-                  {featured?.pair ?? "XAU/USD"} ·{" "}
+                  GOLD ·{" "}
                   {featured ? ageLabel(featured.createdAt) : "—"}
                 </p>
                 <h3 className="mt-3 max-w-xs text-[32px] font-semibold capitalize leading-tight tracking-[-0.03em] text-white">
@@ -167,7 +165,7 @@ export function LatestTicket() {
             <div className="relative z-10 flex items-start justify-between">
               <div>
                 <p className="text-[13px] text-white/45">
-                  {second?.pair ?? "XAU/USD"} ·{" "}
+                  GOLD ·{" "}
                   {second ? ageLabel(second.createdAt) : "—"}
                 </p>
                 <h3 className="mt-3 text-[28px] font-semibold capitalize tracking-[-0.03em] text-white">
@@ -202,7 +200,7 @@ export function LatestTicket() {
             <div className="relative z-10 flex items-start justify-between">
               <div>
                 <p className="text-[13px] text-white/45">
-                  {closed?.pair ?? "XAU/USD"} · closed
+                  GOLD · closed
                 </p>
                 <h3 className="mt-3 text-[28px] font-semibold capitalize tracking-[-0.03em] text-white">
                   {closed ? ticketTitle(closed) : "No close yet"}
@@ -213,8 +211,7 @@ export function LatestTicket() {
               </span>
             </div>
             <p className="relative z-10 mt-4 max-w-md text-[14px] leading-6 text-white/50">
-              Closed plan shown as social proof of execution, mock data, not a
-              live guarantee.
+              Closed plan shown as social proof of execution, not a live guarantee.
             </p>
           </Link>
         </div>

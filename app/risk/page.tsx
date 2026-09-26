@@ -3,11 +3,11 @@ import Link from "next/link";
 const RULES = [
   {
     title: "Risk per trade",
-    body: "Keep risk at or below 0.5%–1% per plan. If the stop is wide, size down. Never widen the published SL to keep a larger lot.",
+    body: "Keep risk at or below 0.5% to 1% per plan. If the stop is wide, size down. Never widen the published SL to keep a larger lot.",
   },
   {
     title: "Maximum exposure",
-    body: "Do not stack correlated XAU positions. One idea, one risk budget. A second ticket in the same direction is the same bet.",
+    body: "Do not stack correlated gold positions. One idea, one risk budget. A second ticket in the same direction is the same bet.",
   },
   {
     title: "Stop loss discipline",
@@ -30,7 +30,7 @@ const START = [
   },
   {
     title: "Honor invalidation",
-    body: "If SL prints, flatten. A new ticket is a new plan — not a continuation of the dead one.",
+    body: "If SL prints, flatten. A new ticket is a new plan, not a continuation of the dead one.",
   },
 ];
 
@@ -108,9 +108,9 @@ export default function RiskPage() {
               Not financial advice
             </p>
             <p className="relative mt-3 max-w-2xl text-sm leading-6 text-white/55">
-              Trading XAUUSD involves risk of loss, including loss of capital.
+              Trading gold involves risk of loss, including loss of capital.
               Published tickets are educational execution notes. Past pips on
-              this desk are mock / demo unless marked live. You size and click
+              this desk are illustrative unless marked live. You size and click
               the order. We do not manage your account.
             </p>
             <Link

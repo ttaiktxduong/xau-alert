@@ -20,18 +20,16 @@ export function Footer() {
           <Link href="/" className="flex items-center gap-2.5">
             <img
               src="/logo-xau.jpg"
-              alt="XAU Alert"
+              alt="Cfdaurix"
               className="h-9 w-9 rounded-lg object-cover"
             />
-            <span className="flex items-baseline gap-1.5">
-              <span className="text-[17px] font-semibold tracking-wide text-white">XAU</span>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#E2B42A]">
-                Alert
-              </span>
+            <span className="flex items-baseline gap-1">
+              <span className="text-[17px] font-semibold tracking-wide text-white">Cfd</span>
+              <span className="text-[17px] font-semibold tracking-wide text-[#E2B42A]">aurix</span>
             </span>
           </Link>
           <p className="mt-4 max-w-sm text-sm leading-6 text-white/45">
-            XAUUSD signals issued as trade tickets. Not financial advice.
+            Gold signals issued as trade tickets. Not financial advice.
           </p>
         </div>
 
@@ -70,7 +68,7 @@ export function Footer() {
 
       <div className="border-t border-white/8">
         <p className="mx-auto max-w-[1240px] px-6 py-5 text-[12px] text-white/35">
-          © {new Date().getFullYear()} XAU Desk · Not financial advice
+          © {new Date().getFullYear()} Cfdaurix. Not financial advice.
         </p>
       </div>
     </footer>

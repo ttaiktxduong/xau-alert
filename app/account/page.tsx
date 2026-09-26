@@ -18,6 +18,14 @@ export default function AccountPage() {
     if (ready && !user) router.replace("/login");
   }, [ready, user, router]);
 
+  useEffect(() => {
+    if (!ready || !user) return;
+    const paid = new URLSearchParams(window.location.search).get("paid");
+    if (paid !== "1") return;
+    grantVip("vip", user.email);
+    router.replace("/account");
+  }, [ready, user, router]);
+
   if (!ready || !user) {
     return (
       <div className="bg-[#050505] px-6 pb-20 pt-[118px] text-center text-sm text-white/40">
@@ -59,7 +67,7 @@ export default function AccountPage() {
               </div>
             </div>
             <p className="relative mt-5 text-xs text-white/35">
-              Demo session in this browser only.
+              Signed in on this device.
             </p>
           </div>
 
@@ -87,7 +95,7 @@ export default function AccountPage() {
                 }}
                 className="rounded-[22px] bg-[#121212] px-5 py-4 text-left text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
               >
-                {vip ? "Lock VIP preview" : "Preview VIP (demo)"}
+                {vip ? "Lock VIP preview" : "Preview VIP"}
               </button>
             )}
           </div>
