@@ -39,25 +39,7 @@ export function Pricing() {
       window.location.href = "/login";
       return;
     }
-    setBusy(true);
-    setError("");
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: active, email: user.email }),
-      });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) {
-        setError(data.error || "Checkout failed.");
-        return;
-      }
-      window.location.href = data.url;
-    } catch {
-      setError("Checkout failed.");
-    } finally {
-      setBusy(false);
-    }
+    window.location.href = `/checkout?plan=${active}`;
   }
 
   function pick(next: Plan) {

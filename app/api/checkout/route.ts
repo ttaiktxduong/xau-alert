@@ -16,11 +16,10 @@ export async function POST(req: NextRequest) {
   const orderId = `xau_${plan}_${Date.now()}`;
 
   if (!process.env.HELEKET_MERCHANT_ID || !process.env.HELEKET_PAYMENT_KEY) {
-    const demo = new URL("/checkout/demo", origin);
-    demo.searchParams.set("plan", plan);
-    demo.searchParams.set("amount", selected.amount);
-    demo.searchParams.set("order", orderId);
-    return NextResponse.json({ url: demo.toString(), orderId, demo: true });
+    return NextResponse.json(
+      { error: "Heleket is not configured. Add merchant ID and payment key." },
+      { status: 503 },
+    );
   }
 
   try {

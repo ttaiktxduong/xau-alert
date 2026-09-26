@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useAuth } from "../components/auth/AuthProvider";
 import { isAdmin } from "../lib/admin";
 import { roleLabel, useRole } from "../lib/roles";
-import { grantVip, revokeVip, useVip } from "../lib/vip";
+import { grantVip, useVip } from "../lib/vip";
 
 export default function AccountPage() {
   const { user, ready, logout } = useAuth();
@@ -71,7 +71,7 @@ export default function AccountPage() {
             </p>
           </div>
 
-          <div className={`mt-4 grid gap-3 ${isAdmin(user.email) ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Link
               href="/signals"
               className="rounded-[22px] bg-[#121212] px-5 py-4 text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
@@ -85,18 +85,13 @@ export default function AccountPage() {
               >
                 Admin desk
               </Link>
-            ) : null}
-            {role === "admin" ? null : (
-              <button
-                type="button"
-                onClick={() => {
-                  if (vip) revokeVip(user.email);
-                  else grantVip("vip", user.email);
-                }}
-                className="rounded-[22px] bg-[#121212] px-5 py-4 text-left text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
+            ) : (
+              <Link
+                href="/#pricing"
+                className="rounded-[22px] bg-[#121212] px-5 py-4 text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
               >
-                {vip ? "Lock VIP preview" : "Preview VIP"}
-              </button>
+                {vip ? "Renew access" : "Unlock VIP"}
+              </Link>
             )}
           </div>
 
