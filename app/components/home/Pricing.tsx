@@ -85,7 +85,6 @@ export function Pricing() {
               <ul className="mt-6 space-y-2.5 text-[14px] text-white/55">
                 <li>Live gold signals</li>
                 <li>Entry zones · Stop loss · TP1/2/3</li>
-                <li>Telegram support</li>
               </ul>
             </div>
             {owned === "trial" ? (
