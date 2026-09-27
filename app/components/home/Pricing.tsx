@@ -8,8 +8,8 @@ import { daysLeft, useVipState, type VipPlan } from "../../lib/vip";
 type Plan = VipPlan;
 
 const PLANS = {
-  trial: { name: "7-day trial", price: 29, period: "7 days" },
-  vip: { name: "Monthly VIP", price: 89, period: "month" },
+  trial: { name: "Aurix Spark", price: 29, period: "7 days" },
+  vip: { name: "Aurix Vault", price: 89, period: "month" },
 } as const;
 
 export function Pricing() {
@@ -77,7 +77,7 @@ export function Pricing() {
             }`}
           >
             <div className={owned === "trial" ? "blur-[2px]" : ""}>
-              <p className="text-sm font-medium text-white/60">7-day trial</p>
+              <p className="text-sm font-medium text-white/60">Aurix Spark</p>
               <p className="mt-4 text-[44px] font-semibold tracking-[-0.04em] text-white">
                 $29
                 <span className="ml-2 text-base font-normal text-white/40">/ 7 days</span>
@@ -121,7 +121,7 @@ export function Pricing() {
               <span className="rounded-full bg-[#E2B42A] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#1A1408]">
                 Most popular
               </span>
-              <p className="mt-4 text-sm font-medium text-white/60">Monthly VIP</p>
+              <p className="mt-4 text-sm font-medium text-white/60">Aurix Vault</p>
               <p className="mt-2 text-[44px] font-semibold tracking-[-0.04em] text-white">
                 $89
                 <span className="ml-2 text-base font-normal text-white/40">/ month</span>

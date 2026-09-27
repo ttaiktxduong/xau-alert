@@ -3,8 +3,8 @@ import { createHash } from "crypto";
 const ENDPOINT = "https://api.heleket.com/v1/payment";
 
 export const CHECKOUT_PLANS = {
-  trial: { name: "7-day trial", amount: "29", period: "7 days" },
-  vip: { name: "Monthly VIP", amount: "89", period: "month" },
+  trial: { name: "Aurix Spark", amount: "29", period: "7 days" },
+  vip: { name: "Aurix Vault", amount: "89", period: "month" },
 } as const;
 
 export type CheckoutPlan = keyof typeof CHECKOUT_PLANS;
