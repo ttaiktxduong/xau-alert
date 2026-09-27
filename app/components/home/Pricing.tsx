@@ -131,7 +131,6 @@ export function Pricing() {
                 <li>Live gold signals</li>
                 <li>Entry · SL · TP1 / TP2 / TP3</li>
                 <li>Trading plans + performance tracking</li>
-                <li>Telegram support</li>
               </ul>
             </div>
             {owned === "vip" ? (
