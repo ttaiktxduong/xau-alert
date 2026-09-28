@@ -25,7 +25,7 @@ export function Hero() {
               href="#pricing"
               className="inline-flex h-12 items-center rounded-full bg-[#1a1a1a] px-7 text-[15px] font-medium text-white ring-1 ring-white/10 transition hover:bg-[#242424]"
             >
-              Unlock VIP
+              Unlock Aurix access
             </Link>
           </div>
         </div>

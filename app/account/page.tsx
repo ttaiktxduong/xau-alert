@@ -90,7 +90,7 @@ export default function AccountPage() {
                 href="/#pricing"
                 className="rounded-[22px] bg-[#121212] px-5 py-4 text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
               >
-                {vip ? "Renew access" : "Unlock VIP"}
+                {vip ? "Renew access" : "Unlock Aurix access"}
               </Link>
             )}
           </div>

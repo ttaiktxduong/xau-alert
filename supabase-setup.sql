@@ -16,11 +16,27 @@ create policy "anyone can send support"
   to anon, authenticated
   with check (true);
 
+alter table public.messages add column if not exists reply text;
+alter table public.messages add column if not exists replied_at timestamptz;
+
 drop policy if exists "admin can read support" on public.messages;
 create policy "admin can read support"
   on public.messages for select
   to authenticated
   using (auth.jwt() ->> 'email' = 'howopus1@gmail.com');
+
+drop policy if exists "user reads own support" on public.messages;
+create policy "user reads own support"
+  on public.messages for select
+  to authenticated
+  using (lower(email) = lower(auth.jwt() ->> 'email'));
+
+drop policy if exists "admin can reply support" on public.messages;
+create policy "admin can reply support"
+  on public.messages for update
+  to authenticated
+  using (auth.jwt() ->> 'email' = 'howopus1@gmail.com')
+  with check (auth.jwt() ->> 'email' = 'howopus1@gmail.com');
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,

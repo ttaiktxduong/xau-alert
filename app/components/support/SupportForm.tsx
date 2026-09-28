@@ -6,7 +6,13 @@ import { getSupabase, hasSupabase } from "../../lib/supabase";
 const field =
   "mt-2 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-white outline-none placeholder:text-white/25 focus:border-[#E2B42A]";
 
-export function SupportForm() {
+type Props = {
+  defaultName?: string;
+  defaultEmail?: string;
+  onSent?: () => void;
+};
+
+export function SupportForm({ defaultName = "", defaultEmail = "", onSent }: Props) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -21,7 +27,7 @@ export function SupportForm() {
       setBusy(true);
       const { error: err } = await sb!.from("messages").insert({
         name: String(data.get("name") || ""),
-        email: String(data.get("email") || ""),
+        email: String(data.get("email") || "").trim().toLowerCase(),
         body: String(data.get("message") || ""),
       });
       setBusy(false);
@@ -31,6 +37,7 @@ export function SupportForm() {
       }
     }
     setSent(true);
+    onSent?.();
   }
 
   if (sent) {
@@ -39,7 +46,7 @@ export function SupportForm() {
         <p className="text-[20px] font-semibold text-white">Message received.</p>
         <p className="mt-2 text-sm leading-6 text-white/50">
           {hasSupabase()
-            ? "The desk can read this note in Admin, Support inbox."
+            ? "The desk will reply here. Check this page while signed in."
             : "Supabase is not connected. This note is not stored on the server."}
         </p>
         <button
@@ -60,11 +67,23 @@ export function SupportForm() {
     >
       <label className="block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
         Name
-        <input required name="name" className={field} />
+        <input
+          required
+          name="name"
+          defaultValue={defaultName}
+          className={field}
+        />
       </label>
       <label className="mt-4 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
         Email
-        <input required type="email" name="email" className={field} />
+        <input
+          required
+          type="email"
+          name="email"
+          defaultValue={defaultEmail}
+          readOnly={Boolean(defaultEmail)}
+          className={`${field} ${defaultEmail ? "opacity-70" : ""}`}
+        />
       </label>
       <label className="mt-4 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
         Message
