@@ -406,6 +406,45 @@ export function closeTicket(id: string, result: Result, pips: number) {
   });
 }
 
+export function addFreeTicket(input: {
+  side: Side;
+  setup: Setup;
+  entry: string;
+  sl: string;
+  tp1: string;
+  tp2?: string;
+  tp3?: string;
+}) {
+  const state = read();
+  const ticket: Ticket = {
+    id: uid("t"),
+    pair: "XAU/USD",
+    side: input.side,
+    setup: input.setup,
+    open: true,
+    status: "New plan",
+    vip: false,
+    createdAt: Date.now(),
+    entry: input.entry,
+    sl: input.sl,
+    tp1: input.tp1,
+    tp2: input.tp2,
+    tp3: input.tp3,
+  };
+  const note: Note = {
+    id: uid("n"),
+    title: `${input.side.toUpperCase()} ${input.setup} · free`,
+    body: "New XAU/USD plan. Entry, stop and targets are open.",
+    href: "/signals",
+    createdAt: ticket.createdAt,
+    unread: true,
+  };
+  write({
+    tickets: [ticket, ...state.tickets],
+    notes: [note, ...state.notes],
+  });
+}
+
 export function removeTicket(id: string) {
   const state = read();
   write({

@@ -6,6 +6,7 @@ import { Inbox } from "../components/admin/Inbox";
 import { Members } from "../components/admin/Members";
 import { useAuth } from "../components/auth/AuthProvider";
 import { deskUnlocked, isAdmin, lockDesk, unlockDesk } from "../lib/admin";
+
 import {
   addTicket,
   ageLabel,
@@ -35,7 +36,7 @@ export default function AdminPage() {
   const [side, setSide] = useState<Side>("sell");
   const [setup, setSetup] = useState<Setup>("limit");
   const [status, setStatus] = useState("New plan");
-  const [vip, setVip] = useState(true);
+  const [vip, setVip] = useState(false);
   const [entry, setEntry] = useState("");
   const [sl, setSl] = useState("");
   const [tp1, setTp1] = useState("");
@@ -168,7 +169,6 @@ export default function AdminPage() {
 
           <Members />
           <Inbox />
-
           <form
             onSubmit={onCreate}
             className="mt-8 rounded-[28px] bg-[#121212] p-6 ring-1 ring-white/[0.06] md:p-7"
