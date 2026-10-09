@@ -86,7 +86,7 @@ export function SignalBoard() {
             <div>
               <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#E2B42A]" />
-                Live CFD Aurix signals
+                Live gold signals
               </p>
               <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-white md:text-4xl">
                 Signal desk
@@ -129,7 +129,7 @@ export function SignalBoard() {
                   <div className="relative flex items-start justify-between">
                     <div>
                       <p suppressHydrationWarning className="text-[12px] text-white/40">
-                        CFD AURIX · {ageLabel(t.createdAt)}
+                        GOLD · {ageLabel(t.createdAt)}
                       </p>
                       <p className="mt-2 text-[22px] font-semibold capitalize tracking-[-0.03em] text-white">
                         {ticketTitle(t)}

@@ -82,6 +82,7 @@ export function LatestTicket() {
   const second = open[1];
   const closed = tickets.find((t) => !t.open);
 
+  // Lệnh chỉ bị khóa nếu lệnh đó là VIP và user chưa có VIP/Admin
   const isFeaturedLocked = featured ? (featured.vip && !unlocked) : false;
   const isSecondLocked = second ? (second.vip && !unlocked) : false;
 
@@ -91,7 +92,7 @@ export function LatestTicket() {
         <div className="mb-5 flex items-center justify-between">
           <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
             <span className="h-1.5 w-1.5 rounded-full bg-[#E2B42A]" />
-            Live CFD Aurix signals
+            Live gold signals
           </p>
           <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/30">
             Desk feed
@@ -119,7 +120,7 @@ export function LatestTicket() {
             <div className="relative z-10 flex items-start justify-between">
               <div>
                 <p suppressHydrationWarning className="text-[13px] text-white/45">
-                  CFD AURIX ·{" "}
+                  GOLD ·{" "}
                   {featured ? ageLabel(featured.createdAt) : "—"}
                 </p>
                 <h3 className="mt-3 max-w-xs text-[32px] font-semibold capitalize leading-tight tracking-[-0.03em] text-white">
@@ -182,7 +183,7 @@ export function LatestTicket() {
             <div className="relative z-10 flex items-start justify-between">
               <div>
                 <p suppressHydrationWarning className="text-[13px] text-white/45">
-                  CFD AURIX ·{" "}
+                  GOLD ·{" "}
                   {second ? ageLabel(second.createdAt) : "—"}
                 </p>
                 <h3 className="mt-3 text-[28px] font-semibold capitalize tracking-[-0.03em] text-white">
@@ -223,7 +224,7 @@ export function LatestTicket() {
             <div className="relative z-10 flex items-start justify-between">
               <div>
                 <p className="text-[13px] text-white/45">
-                  CFD AURIX · closed
+                  GOLD · closed
                 </p>
                 <h3 className="mt-3 text-[28px] font-semibold capitalize tracking-[-0.03em] text-white">
                   {closed ? ticketTitle(closed) : "No close yet"}

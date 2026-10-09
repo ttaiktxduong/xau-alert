@@ -82,16 +82,13 @@ export function LatestTicket() {
   const second = open[1];
   const closed = tickets.find((t) => !t.open);
 
-  const isFeaturedLocked = featured ? (featured.vip && !unlocked) : false;
-  const isSecondLocked = second ? (second.vip && !unlocked) : false;
-
   return (
     <section className="bg-[#050505] px-6 pb-12 pt-6">
       <div className="mx-auto max-w-[1240px]">
         <div className="mb-5 flex items-center justify-between">
           <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
             <span className="h-1.5 w-1.5 rounded-full bg-[#E2B42A]" />
-            Live CFD Aurix signals
+            Live gold signals
           </p>
           <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/30">
             Desk feed
@@ -102,13 +99,9 @@ export function LatestTicket() {
           <article
             role="link"
             tabIndex={0}
-            onClick={() => {
-              if (isFeaturedLocked) scrollToPricing();
-            }}
+            onClick={scrollToPricing}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                if (isFeaturedLocked) scrollToPricing();
-              }
+              if (e.key === "Enter" || e.key === " ") scrollToPricing();
             }}
             className="relative min-h-[420px] cursor-pointer overflow-hidden rounded-[28px] bg-[#121212] p-7 lg:row-span-2"
           >
@@ -118,8 +111,8 @@ export function LatestTicket() {
             />
             <div className="relative z-10 flex items-start justify-between">
               <div>
-                <p suppressHydrationWarning className="text-[13px] text-white/45">
-                  CFD AURIX ·{" "}
+                <p className="text-[13px] text-white/45">
+                  GOLD ·{" "}
                   {featured ? ageLabel(featured.createdAt) : "—"}
                 </p>
                 <h3 className="mt-3 max-w-xs text-[32px] font-semibold capitalize leading-tight tracking-[-0.03em] text-white">
@@ -129,19 +122,13 @@ export function LatestTicket() {
                   {featured?.status ?? "Publish a ticket in Admin to show it here."}
                 </p>
               </div>
-              {featured?.vip ? (
-                <span className="rounded-full border border-[#E2B42A]/40 bg-[#E2B42A]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#E2B42A]">
-                  VIP
-                </span>
-              ) : (
-                <span className="rounded-full border border-[#3DCF86]/40 bg-[#3DCF86]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#3DCF86]">
-                  FREE SIGNAL
-                </span>
-              )}
+              <span className="rounded-full border border-[#E2B42A]/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#E2B42A]">
+                VIP
+              </span>
             </div>
 
             <div className="relative z-10 mt-6 max-w-sm">
-              {featured && (!isFeaturedLocked ? <OpenRows ticket={featured} /> : <LockRows />)}
+              {unlocked ? <OpenRows ticket={featured} /> : <LockRows />}
             </div>
 
             <BrandMark />
@@ -165,13 +152,9 @@ export function LatestTicket() {
           <article
             role="link"
             tabIndex={0}
-            onClick={() => {
-              if (isSecondLocked) scrollToPricing();
-            }}
+            onClick={scrollToPricing}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                if (isSecondLocked) scrollToPricing();
-              }
+              if (e.key === "Enter" || e.key === " ") scrollToPricing();
             }}
             className="relative cursor-pointer overflow-hidden rounded-[28px] bg-[#121212] p-7"
           >
@@ -181,8 +164,8 @@ export function LatestTicket() {
             />
             <div className="relative z-10 flex items-start justify-between">
               <div>
-                <p suppressHydrationWarning className="text-[13px] text-white/45">
-                  CFD AURIX ·{" "}
+                <p className="text-[13px] text-white/45">
+                  GOLD ·{" "}
                   {second ? ageLabel(second.createdAt) : "—"}
                 </p>
                 <h3 className="mt-3 text-[28px] font-semibold capitalize tracking-[-0.03em] text-white">
@@ -192,22 +175,16 @@ export function LatestTicket() {
                   {second?.status ?? "The next open ticket will land in this card."}
                 </p>
               </div>
-              {second?.vip ? (
-                <span className="rounded-full border border-[#E2B42A]/40 bg-[#E2B42A]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#E2B42A]">
-                  VIP
-                </span>
-              ) : (
-                <span className="rounded-full border border-[#3DCF86]/40 bg-[#3DCF86]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#3DCF86]">
-                  FREE SIGNAL
-                </span>
-              )}
+              <span className="rounded-full border border-[#E2B42A]/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#E2B42A]">
+                VIP
+              </span>
             </div>
             <div className="relative z-10 max-w-md">
-              {second && (!isSecondLocked ? <OpenRows ticket={second} /> : <LockRows />)}
+              {unlocked ? <OpenRows ticket={second} /> : <LockRows />}
             </div>
-            {isSecondLocked && (
+            {unlocked ? null : (
               <span className="relative z-10 mt-5 inline-flex h-11 items-center rounded-full bg-[#E2B42A] px-5 text-[13px] font-medium text-[#1A1408]">
-                Unlock Entry &amp; SL (VIP)
+                Unlock Entry &amp; SL
               </span>
             )}
           </article>
@@ -223,7 +200,7 @@ export function LatestTicket() {
             <div className="relative z-10 flex items-start justify-between">
               <div>
                 <p className="text-[13px] text-white/45">
-                  CFD AURIX · closed
+                  GOLD · closed
                 </p>
                 <h3 className="mt-3 text-[28px] font-semibold capitalize tracking-[-0.03em] text-white">
                   {closed ? ticketTitle(closed) : "No close yet"}

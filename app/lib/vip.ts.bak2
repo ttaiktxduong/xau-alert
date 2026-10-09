@@ -103,6 +103,7 @@ export function useVipPlan(email?: string | null) {
   return useVipState(email)?.plan ?? null;
 }
 
+// Kiểm tra trạng thái VIP theo thời gian thực (hết hạn sẽ tự động trả về false)
 export function isVipActive(expiresAt?: number | string | null): boolean {
   if (!expiresAt) return false;
   const time = typeof expiresAt === "string" ? new Date(expiresAt).getTime() : expiresAt;
@@ -114,6 +115,7 @@ export function useVip(email?: string | null) {
   return isVipActive(state?.expiresAt);
 }
 
+// Tính số ngày còn lại
 export function getDaysRemaining(expiresAt?: string | number | null): number {
   if (!expiresAt) return 0;
   const time = typeof expiresAt === "string" ? new Date(expiresAt).getTime() : expiresAt;
@@ -122,18 +124,20 @@ export function getDaysRemaining(expiresAt?: string | number | null): number {
   return Math.ceil(diff / (24 * 60 * 60 * 1000));
 }
 
+// Giữ lại hàm cũ để tương thích
 export function daysLeft(expiresAt: number, now: number) {
   const ms = expiresAt - now;
   if (ms <= 0) return 0;
   return Math.ceil(ms / (24 * 60 * 60 * 1000));
 }
 
+// Định dạng ngày hết hạn (DD/MM/YYYY)
 export function formatExpireDate(expiresAt?: string | number | null): string {
-  if (!expiresAt) return "None";
+  if (!expiresAt) return "Không có";
   const date = new Date(expiresAt);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
+  return date.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
     year: "numeric",
   });
 }

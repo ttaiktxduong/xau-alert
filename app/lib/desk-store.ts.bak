@@ -1,0 +1,443 @@
+"use client";
+
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { getSupabase, hasSupabase } from "./supabase";
+
+export type Ticket = {
+  id: string;
+  pair: string;
+  side: "buy" | "sell";
+  setup: "limit" | "market";
+  open: boolean;
+  status: string;
+  vip: boolean;
+  createdAt: number;
+  closedAt?: number;
+  entry?: string;
+  sl?: string;
+  tp1?: string;
+  tp2?: string;
+  tp3?: string;
+  pips?: number;
+  result?: string;
+};
+
+export type Note = {
+  id: string;
+  title: string;
+  body: string;
+  href: string;
+  createdAt: number;
+  unread: boolean;
+};
+
+const KEY = "xau-desk-v1";
+const EVENT = "xau-desk";
+const now = Date.now();
+const m = 60_000;
+const h = 60 * m;
+const d = 24 * h;
+
+const SEED_TICKETS: Ticket[] = [
+  {
+    id: "t1",
+    pair: "XAU/USD",
+    side: "sell",
+    setup: "limit",
+    open: true,
+    status: "New plan",
+    vip: false, // Để lệnh đầu tiên là Free cho khách trải nghiệm
+    createdAt: now - 5 * m,
+    entry: "2648–2652",
+    sl: "2661",
+    tp1: "2638",
+    tp2: "2629",
+    tp3: "2618",
+  },
+  {
+    id: "t2",
+    pair: "XAU/USD",
+    side: "buy",
+    setup: "limit",
+    open: true,
+    status: "New plan",
+    vip: true,
+    createdAt: now - 12 * m,
+    entry: "2632–2636",
+    sl: "2624",
+    tp1: "2646",
+    tp2: "2655",
+    tp3: "2668",
+  },
+  {
+    id: "t3",
+    pair: "XAU/USD",
+    side: "buy",
+    setup: "market",
+    open: true,
+    status: "Running",
+    vip: true,
+    createdAt: now - 41 * m,
+    entry: "2641",
+    sl: "2633",
+    tp1: "2652",
+    tp2: "2660",
+    tp3: "2672",
+  },
+  {
+    id: "t4",
+    pair: "XAU/USD",
+    side: "sell",
+    setup: "limit",
+    open: true,
+    status: "Waiting zone",
+    vip: true,
+    createdAt: now - 1 * h,
+    entry: "2656–2660",
+    sl: "2668",
+    tp1: "2644",
+    tp2: "2634",
+    tp3: "2622",
+  },
+  {
+    id: "t5",
+    pair: "XAU/USD",
+    side: "sell",
+    setup: "market",
+    open: false,
+    status: "Hit TP1",
+    vip: false,
+    createdAt: now - 3 * h,
+    closedAt: now - 2 * h,
+    pips: 42,
+    result: "Hit TP1",
+  },
+  {
+    id: "t6",
+    pair: "XAU/USD",
+    side: "buy",
+    setup: "limit",
+    open: false,
+    status: "Hit TP2",
+    vip: false,
+    createdAt: now - 2 * d,
+    closedAt: now - 1 * d,
+    pips: 86,
+    result: "Hit TP2",
+  },
+  {
+    id: "t7",
+    pair: "XAU/USD",
+    side: "sell",
+    setup: "limit",
+    open: false,
+    status: "Stopped",
+    vip: false,
+    createdAt: now - 3 * d,
+    closedAt: now - 2 * d,
+    pips: -18,
+    result: "Stopped",
+  },
+  {
+    id: "t8",
+    pair: "XAU/USD",
+    side: "buy",
+    setup: "market",
+    open: false,
+    status: "Hit TP1",
+    vip: false,
+    createdAt: now - 4 * d,
+    closedAt: now - 3 * d,
+    pips: 31,
+    result: "Hit TP1",
+  },
+];
+
+const SEED_NOTES: Note[] = [
+  {
+    id: "n1",
+    title: "Lệnh FREE mới: SELL LIMIT",
+    body: "Tín hiệu Vàng công khai. Tất cả mọi người có thể xem Entry và SL.",
+    href: "/signals",
+    createdAt: now - 5 * m,
+    unread: true,
+  },
+  {
+    id: "n2",
+    title: "Lệnh VIP: BUY LIMIT",
+    body: "Tín hiệu Vàng mới cho thành viên VIP.",
+    href: "/signals",
+    createdAt: now - 12 * m,
+    unread: true,
+  },
+  {
+    id: "n3",
+    title: "SELL hit TP1",
+    body: "Lệnh đã chốt lời thành công +42 pips.",
+    href: "/performance",
+    createdAt: now - 2 * h,
+    unread: true,
+  },
+];
+
+type DeskState = {
+  tickets: Ticket[];
+  notes: Note[];
+};
+
+let memoryState: DeskState = {
+  tickets: SEED_TICKETS,
+  notes: SEED_NOTES,
+};
+
+function readLocal(): DeskState {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return memoryState;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed.tickets) && Array.isArray(parsed.notes)) {
+      memoryState = parsed;
+      return parsed;
+    }
+  } catch {
+    /* fallback to memory */
+  }
+  return memoryState;
+}
+
+function writeLocal(next: DeskState) {
+  memoryState = next;
+  try {
+    localStorage.setItem(KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+  window.dispatchEvent(new Event(EVENT));
+}
+
+function mapSupabaseRow(row: any): Ticket {
+  return {
+    id: String(row.id),
+    pair: row.pair || "XAU/USD",
+    side: row.side || "sell",
+    setup: row.setup || "limit",
+    open: Boolean(row.open),
+    status: row.status || "New plan",
+    vip: Boolean(row.vip),
+    createdAt: row.created_at ? new Date(row.created_at).getTime() : Date.now(),
+    closedAt: row.closed_at ? new Date(row.closed_at).getTime() : undefined,
+    entry: row.entry || undefined,
+    sl: row.sl || undefined,
+    tp1: row.tp1 || undefined,
+    tp2: row.tp2 || undefined,
+    tp3: row.tp3 || undefined,
+    pips: row.pips != null ? Number(row.pips) : undefined,
+    result: row.result || undefined,
+  };
+}
+
+export function useDesk() {
+  const [supabaseTickets, setSupabaseTickets] = useState<Ticket[] | null>(null);
+
+  // 1. Đồng bộ Realtime từ Supabase khi có kết nối
+  useEffect(() => {
+    const sb = getSupabase();
+    if (!sb) return;
+
+    let isMounted = true;
+
+    async function loadTickets() {
+      const { data, error } = await sb!
+        .from("tickets")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!error && data && data.length > 0 && isMounted) {
+        const mapped = data.map(mapSupabaseRow);
+        setSupabaseTickets(mapped);
+        // Cập nhật cả local cache
+        const current = readLocal();
+        writeLocal({ ...current, tickets: mapped });
+      }
+    }
+
+    loadTickets();
+
+    // Lắng nghe thay đổi Realtime (Insert, Update, Delete)
+    const channel = sb
+      .channel("tickets-feed")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tickets" },
+        () => {
+          loadTickets();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      sb.removeChannel(channel);
+    };
+  }, []);
+
+  const local = useSyncExternalStore(
+    (onStoreChange) => {
+      window.addEventListener(EVENT, onStoreChange);
+      window.addEventListener("storage", onStoreChange);
+      return () => {
+        window.removeEventListener(EVENT, onStoreChange);
+        window.removeEventListener("storage", onStoreChange);
+      };
+    },
+    () => readLocal(),
+    () => memoryState
+  );
+
+  return {
+    tickets: supabaseTickets ?? local.tickets,
+    notes: local.notes,
+  };
+}
+
+export async function addTicket(ticket: Omit<Ticket, "id" | "pair" | "open" | "createdAt">) {
+  const sb = getSupabase();
+  const newTicket: Ticket = {
+    ...ticket,
+    id: `t_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    pair: "XAU/USD",
+    open: true,
+    createdAt: Date.now(),
+  };
+
+  // Cập nhật local trước để UI phản hồi ngay lập tức
+  const current = readLocal();
+  const nextTickets = [newTicket, ...current.tickets];
+  const newNote: Note = {
+    id: `n_${Date.now()}`,
+    title: `Lệnh mới: ${newTicket.side.toUpperCase()} ${newTicket.setup.toUpperCase()}`,
+    body: newTicket.vip ? "Lệnh mới dành cho VIP." : "Lệnh FREE mới đã được công khai.",
+    href: "/signals",
+    createdAt: Date.now(),
+    unread: true,
+  };
+  writeLocal({ tickets: nextTickets, notes: [newNote, ...current.notes] });
+
+  // Ghi vào Supabase Database
+  if (sb) {
+    try {
+      await sb.from("tickets").insert({
+        pair: newTicket.pair,
+        side: newTicket.side,
+        setup: newTicket.setup,
+        status: newTicket.status,
+        vip: newTicket.vip,
+        entry: newTicket.entry,
+        sl: newTicket.sl,
+        tp1: newTicket.tp1,
+        tp2: newTicket.tp2,
+        tp3: newTicket.tp3,
+        open: true,
+      });
+    } catch (e) {
+      console.warn("Could not insert ticket to Supabase:", e);
+    }
+  }
+}
+
+export async function closeTicket(id: string, result: string, pips: number) {
+  const current = readLocal();
+  const nextTickets = current.tickets.map((t) => {
+    if (t.id !== id) return t;
+    return {
+      ...t,
+      open: false,
+      status: result,
+      result,
+      pips,
+      closedAt: Date.now(),
+    };
+  });
+  writeLocal({ ...current, tickets: nextTickets });
+
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      await sb
+        .from("tickets")
+        .update({
+          open: false,
+          status: result,
+          result,
+          pips,
+          closed_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+    } catch (e) {
+      console.warn("Could not close ticket on Supabase:", e);
+    }
+  }
+}
+
+export async function removeTicket(id: string) {
+  const current = readLocal();
+  const nextTickets = current.tickets.filter((t) => t.id !== id);
+  writeLocal({ ...current, tickets: nextTickets });
+
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      await sb.from("tickets").delete().eq("id", id);
+    } catch (e) {
+      console.warn("Could not delete ticket from Supabase:", e);
+    }
+  }
+}
+
+export function markNoteRead(id: string) {
+  const current = readLocal();
+  const nextNotes = current.notes.map((n) =>
+    n.id === id ? { ...n, unread: false } : n
+  );
+  writeLocal({ ...current, notes: nextNotes });
+}
+
+export function markAllNotesRead() {
+  const current = readLocal();
+  const nextNotes = current.notes.map((n) => ({ ...n, unread: false }));
+  writeLocal({ ...current, notes: nextNotes });
+}
+
+export function ticketTitle(t: Ticket) {
+  return `${t.side.toUpperCase()} ${t.setup.toUpperCase()}`;
+}
+
+export function ageLabel(ts: number) {
+  const diff = Math.max(0, Date.now() - ts);
+  if (diff < h) {
+    const mins = Math.max(1, Math.round(diff / m));
+    return `${mins}m ago`;
+  }
+  if (diff < d) {
+    const hours = Math.round(diff / h);
+    return `${hours}h ago`;
+  }
+  const days = Math.round(diff / d);
+  return `${days}d ago`;
+}
+
+export function pairLabel(_pair?: string) {
+  return "GOLD";
+}
+
+export function pipsLabel(pips?: number) {
+  if (pips == null) return "0 pips";
+  return `${pips >= 0 ? "+" : ""}${pips} pips`;
+}
+
+export function winrate(tickets: Ticket[]) {
+  const closed = tickets.filter((t) => !t.open);
+  if (closed.length === 0) return 0;
+  const wins = closed.filter((t) => (t.pips ?? 0) > 0).length;
+  return Math.round((wins / closed.length) * 100);
+}

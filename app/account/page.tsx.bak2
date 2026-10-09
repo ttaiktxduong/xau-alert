@@ -32,10 +32,10 @@ export default function AccountPage() {
       <section className="hero-wash px-6 pb-24 pt-[118px] md:pt-[132px]">
         <div className="relative z-10 mx-auto max-w-[560px]">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
-            Account
+            Tài khoản
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-white md:text-4xl">
-            Profile
+            Hồ sơ cá nhân
           </h1>
 
           <div className="relative mt-8 overflow-hidden rounded-[28px] bg-[#121212] p-7 ring-1 ring-white/[0.06]">
@@ -58,11 +58,11 @@ export default function AccountPage() {
               </div>
             </div>
 
-            {/* Membership / Plan details block */}
+            {/* Khối hiển thị quyền VIP & Thời hạn */}
             <div className="relative mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-white/50">
-                  Plan status
+                  Gói dịch vụ
                 </span>
                 <span
                   className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${
@@ -71,27 +71,27 @@ export default function AccountPage() {
                       : "border border-white/10 bg-white/5 text-white/40"
                   }`}
                 >
-                  {isVip ? `VIP (${(user.vip_plan || "Active").toUpperCase()})` : "FREE MEMBER"}
+                  {isVip ? `VIP (${(user.vip_plan || "Active").toUpperCase()})` : "THÀNH VIÊN THƯỜNG"}
                 </span>
               </div>
 
               {isVip && user.vip_expires_at ? (
                 <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3 text-xs">
-                  <span className="text-white/40">Time remaining:</span>
+                  <span className="text-white/40">Thời hạn còn lại:</span>
                   <span className="font-semibold text-emerald-400">
-                    {getDaysRemaining(user.vip_expires_at)} days left (Expires: {formatExpireDate(user.vip_expires_at)})
+                    Còn {getDaysRemaining(user.vip_expires_at)} ngày (Hết hạn: {formatExpireDate(user.vip_expires_at)})
                   </span>
                 </div>
               ) : (
                 <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3 text-xs text-white/40">
-                  <span>Status:</span>
-                  <span>No active VIP plan</span>
+                  <span>Trạng thái:</span>
+                  <span>Chưa kích hoạt gói VIP</span>
                 </div>
               )}
             </div>
 
             <p className="relative mt-5 text-xs text-white/35">
-              Signed in on this device.
+              Đã đăng nhập trên thiết bị này.
             </p>
           </div>
 
@@ -100,21 +100,21 @@ export default function AccountPage() {
               href="/signals"
               className="rounded-[22px] bg-[#121212] px-5 py-4 text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
             >
-              Live signals
+              Bảng tín hiệu (Live signals)
             </Link>
             {isAdmin(user.email) ? (
               <Link
                 href="/admin"
                 className="rounded-[22px] bg-[#121212] px-5 py-4 text-sm text-[#E2B42A] ring-1 ring-[#E2B42A]/30 transition hover:bg-[#E2B42A]/10"
               >
-                Admin desk
+                Trang quản trị (Admin desk)
               </Link>
             ) : (
               <Link
                 href="/#pricing"
                 className="rounded-[22px] bg-[#121212] px-5 py-4 text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
               >
-                {isVip ? "Renew VIP access" : "Unlock VIP access"}
+                {isVip ? "Gia hạn gói VIP" : "Nâng cấp gói VIP"}
               </Link>
             )}
           </div>
@@ -127,7 +127,7 @@ export default function AccountPage() {
             }}
             className="mt-8 rounded-full border border-white/15 px-5 py-2.5 text-[13px] font-semibold text-white/70 transition hover:border-white/40 hover:text-white"
           >
-            Sign out
+            Đăng xuất
           </button>
         </div>
       </section>

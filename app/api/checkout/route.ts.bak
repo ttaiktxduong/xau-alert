@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   } | null;
   const plan = body?.plan;
   if (!plan || !(plan in CHECKOUT_PLANS)) {
-    return NextResponse.json({ error: "Vui lòng chọn gói dịch vụ." }, { status: 400 });
+    return NextResponse.json({ error: "Choose a plan." }, { status: 400 });
   }
 
   const origin = req.headers.get("origin") || req.nextUrl.origin;
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
   if (!process.env.HELEKET_MERCHANT_ID || !process.env.HELEKET_PAYMENT_KEY) {
     return NextResponse.json(
-      { error: "Cổng thanh toán Heleket chưa được cấu hình khóa trên máy chủ." },
+      { error: "Heleket is not configured. Add merchant ID and payment key." },
       { status: 503 },
     );
   }
@@ -27,13 +27,13 @@ export async function POST(req: NextRequest) {
       amount: selected.amount,
       orderId,
       email: body?.email,
-      successUrl: `${origin}/account?success=1&order=${orderId}`,
+      successUrl: `${origin}/account?paid=1&order=${orderId}`,
       returnUrl: `${origin}/#pricing`,
       callbackUrl: `${origin}/api/heleket/webhook`,
     });
     return NextResponse.json({ url: invoice.url, orderId });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Khởi tạo thanh toán thất bại.";
+    const message = err instanceof Error ? err.message : "Checkout failed.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

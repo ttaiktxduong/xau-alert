@@ -5,15 +5,25 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "../components/auth/AuthProvider";
 import { isAdmin } from "../lib/admin";
-import { roleLabel } from "../lib/roles";
-import { formatExpireDate, getDaysRemaining } from "../lib/vip";
+import { roleLabel, useRole } from "../lib/roles";
+import { grantVip, useVip } from "../lib/vip";
 
 export default function AccountPage() {
   const { user, ready, logout } = useAuth();
   const router = useRouter();
+  const vip = useVip(user?.email);
+  const role = useRole(user?.email);
 
   useEffect(() => {
     if (ready && !user) router.replace("/login");
+  }, [ready, user, router]);
+
+  useEffect(() => {
+    if (!ready || !user) return;
+    const paid = new URLSearchParams(window.location.search).get("paid");
+    if (paid !== "1") return;
+    grantVip("vip", user.email);
+    router.replace("/account");
   }, [ready, user, router]);
 
   if (!ready || !user) {
@@ -25,7 +35,6 @@ export default function AccountPage() {
   }
 
   const initial = (user.name || user.email || "U").charAt(0).toUpperCase();
-  const isVip = Boolean(user.isVip);
 
   return (
     <div className="min-h-full bg-[#050505] text-white">
@@ -53,43 +62,10 @@ export default function AccountPage() {
                 </p>
                 <p className="mt-1 text-sm text-white/50">{user.email}</p>
                 <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#E2B42A]">
-                  {roleLabel(user.role)}
+                  {roleLabel(role)}
                 </p>
               </div>
             </div>
-
-            {/* Membership / Plan details block */}
-            <div className="relative mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-white/50">
-                  Plan status
-                </span>
-                <span
-                  className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${
-                    isVip
-                      ? "border border-[#E2B42A]/40 bg-[#E2B42A]/10 text-[#E2B42A]"
-                      : "border border-white/10 bg-white/5 text-white/40"
-                  }`}
-                >
-                  {isVip ? `VIP (${(user.vip_plan || "Active").toUpperCase()})` : "FREE MEMBER"}
-                </span>
-              </div>
-
-              {isVip && user.vip_expires_at ? (
-                <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3 text-xs">
-                  <span className="text-white/40">Time remaining:</span>
-                  <span className="font-semibold text-emerald-400">
-                    {getDaysRemaining(user.vip_expires_at)} days left (Expires: {formatExpireDate(user.vip_expires_at)})
-                  </span>
-                </div>
-              ) : (
-                <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3 text-xs text-white/40">
-                  <span>Status:</span>
-                  <span>No active VIP plan</span>
-                </div>
-              )}
-            </div>
-
             <p className="relative mt-5 text-xs text-white/35">
               Signed in on this device.
             </p>
@@ -105,7 +81,7 @@ export default function AccountPage() {
             {isAdmin(user.email) ? (
               <Link
                 href="/admin"
-                className="rounded-[22px] bg-[#121212] px-5 py-4 text-sm text-[#E2B42A] ring-1 ring-[#E2B42A]/30 transition hover:bg-[#E2B42A]/10"
+                className="rounded-[22px] bg-[#121212] px-5 py-4 text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
               >
                 Admin desk
               </Link>
@@ -114,7 +90,7 @@ export default function AccountPage() {
                 href="/#pricing"
                 className="rounded-[22px] bg-[#121212] px-5 py-4 text-sm text-white/70 ring-1 ring-white/[0.06] transition hover:text-white"
               >
-                {isVip ? "Renew VIP access" : "Unlock VIP access"}
+                {vip ? "Renew access" : "Unlock Aurix access"}
               </Link>
             )}
           </div>

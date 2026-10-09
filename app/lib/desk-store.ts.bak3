@@ -20,7 +20,6 @@ export type Ticket = {
   tp3?: string;
   pips?: number;
   result?: string;
-  note?: string;
 };
 
 export type Note = {
@@ -44,7 +43,7 @@ const d = 24 * h;
 const SEED_TICKETS: Ticket[] = [
   {
     id: "t1",
-    pair: "CFD AURIX",
+    pair: "XAU/USD",
     side: "sell",
     setup: "limit",
     open: true,
@@ -59,7 +58,7 @@ const SEED_TICKETS: Ticket[] = [
   },
   {
     id: "t2",
-    pair: "CFD AURIX",
+    pair: "XAU/USD",
     side: "buy",
     setup: "limit",
     open: true,
@@ -74,7 +73,7 @@ const SEED_TICKETS: Ticket[] = [
   },
   {
     id: "t3",
-    pair: "CFD AURIX",
+    pair: "XAU/USD",
     side: "buy",
     setup: "market",
     open: true,
@@ -89,7 +88,7 @@ const SEED_TICKETS: Ticket[] = [
   },
   {
     id: "t4",
-    pair: "CFD AURIX",
+    pair: "XAU/USD",
     side: "sell",
     setup: "limit",
     open: true,
@@ -104,7 +103,7 @@ const SEED_TICKETS: Ticket[] = [
   },
   {
     id: "t5",
-    pair: "CFD AURIX",
+    pair: "XAU/USD",
     side: "sell",
     setup: "market",
     open: false,
@@ -117,7 +116,7 @@ const SEED_TICKETS: Ticket[] = [
   },
   {
     id: "t6",
-    pair: "CFD AURIX",
+    pair: "XAU/USD",
     side: "buy",
     setup: "limit",
     open: false,
@@ -130,7 +129,7 @@ const SEED_TICKETS: Ticket[] = [
   },
   {
     id: "t7",
-    pair: "CFD AURIX",
+    pair: "XAU/USD",
     side: "sell",
     setup: "limit",
     open: false,
@@ -143,7 +142,7 @@ const SEED_TICKETS: Ticket[] = [
   },
   {
     id: "t8",
-    pair: "CFD AURIX",
+    pair: "XAU/USD",
     side: "buy",
     setup: "market",
     open: false,
@@ -159,16 +158,16 @@ const SEED_TICKETS: Ticket[] = [
 const SEED_NOTES: Note[] = [
   {
     id: "n1",
-    title: "New FREE Signal: SELL LIMIT",
-    body: "CFD Aurix public plan published. Entry and SL unlocked for all visitors.",
+    title: "Lệnh FREE mới: SELL LIMIT",
+    body: "Tín hiệu Vàng công khai. Tất cả mọi người có thể xem Entry và SL.",
     href: "/signals",
     createdAt: now - 5 * m,
     unread: true,
   },
   {
     id: "n2",
-    title: "New VIP Signal: BUY LIMIT",
-    body: "CFD Aurix VIP plan published. Unlock to read the zone.",
+    title: "Lệnh VIP: BUY LIMIT",
+    body: "Tín hiệu Vàng mới cho thành viên VIP.",
     href: "/signals",
     createdAt: now - 12 * m,
     unread: true,
@@ -176,7 +175,7 @@ const SEED_NOTES: Note[] = [
   {
     id: "n3",
     title: "SELL hit TP1",
-    body: "Closed ticket added to ledger as social proof.",
+    body: "Lệnh đã chốt lời thành công +42 pips.",
     href: "/performance",
     createdAt: now - 2 * h,
     unread: true,
@@ -195,84 +194,37 @@ function seed(): DeskState {
   };
 }
 
-let cacheRaw = "";
-let cachedState: DeskState = seed();
+let memoryState: DeskState = seed();
 
 function readLocal(): DeskState {
   try {
     const raw = localStorage.getItem(KEY);
-    if (!raw) {
-      const next = seed();
-      cacheRaw = JSON.stringify(next);
-      cachedState = next;
-      localStorage.setItem(KEY, cacheRaw);
-      return cachedState;
-    }
-    if (raw === cacheRaw) {
-      return cachedState;
-    }
-    cacheRaw = raw;
+    if (!raw) return memoryState;
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed.tickets) && Array.isArray(parsed.notes)) {
-      cachedState = parsed;
-    } else {
-      cachedState = seed();
+      memoryState = parsed;
+      return parsed;
     }
-    return cachedState;
   } catch {
-    return cachedState;
+    /* fallback to memory */
   }
+  return memoryState;
 }
 
 function writeLocal(next: DeskState) {
-  cachedState = next;
+  memoryState = next;
   try {
-    cacheRaw = JSON.stringify(next);
-    localStorage.setItem(KEY, cacheRaw);
+    localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
     /* ignore */
   }
   window.dispatchEvent(new Event(EVENT));
 }
 
-function subscribe(onChange: () => void) {
-  window.addEventListener(EVENT, onChange);
-  window.addEventListener("storage", onChange);
-  return () => {
-    window.removeEventListener(EVENT, onChange);
-    window.removeEventListener("storage", onChange);
-  };
-}
-
-const EMPTY_DESK: DeskState = { tickets: [], notes: [] };
-function getEmptyDesk() {
-  return EMPTY_DESK;
-}
-
-type SupabaseTicketRow = {
-  id: string | number;
-  pair?: string | null;
-  side?: Ticket["side"] | null;
-  setup?: Ticket["setup"] | null;
-  open?: unknown;
-  status?: string | null;
-  vip?: unknown;
-  created_at?: string | number | null;
-  closed_at?: string | number | null;
-  entry?: string | null;
-  sl?: string | null;
-  tp1?: string | null;
-  tp2?: string | null;
-  tp3?: string | null;
-  pips?: number | string | null;
-  result?: string | null;
-  note?: string | null;
-};
-
-function mapSupabaseRow(row: SupabaseTicketRow): Ticket {
+function mapSupabaseRow(row: any): Ticket {
   return {
     id: String(row.id),
-    pair: row.pair || "CFD AURIX",
+    pair: row.pair || "XAU/USD",
     side: row.side || "sell",
     setup: row.setup || "limit",
     open: Boolean(row.open),
@@ -287,7 +239,6 @@ function mapSupabaseRow(row: SupabaseTicketRow): Ticket {
     tp3: row.tp3 || undefined,
     pips: row.pips != null ? Number(row.pips) : undefined,
     result: row.result || undefined,
-    note: row.note || undefined,
   };
 }
 
@@ -307,13 +258,11 @@ export function useDesk() {
           .select("*")
           .order("created_at", { ascending: false });
 
-        if (!error && isMounted) {
-          if (data && data.length > 0) {
-            const mapped = data.map(mapSupabaseRow);
-            setSupabaseTickets(mapped);
-            const current = readLocal();
-            writeLocal({ ...current, tickets: mapped });
-          }
+        if (!error && data && data.length > 0 && isMounted) {
+          const mapped = data.map(mapSupabaseRow);
+          setSupabaseTickets(mapped);
+          const current = readLocal();
+          writeLocal({ ...current, tickets: mapped });
         }
       } catch (err) {
         console.warn("Could not load tickets from Supabase:", err);
@@ -341,7 +290,18 @@ export function useDesk() {
     };
   }, []);
 
-  const local = useSyncExternalStore(subscribe, readLocal, getEmptyDesk);
+  const local = useSyncExternalStore(
+    (onStoreChange) => {
+      window.addEventListener(EVENT, onStoreChange);
+      window.addEventListener("storage", onStoreChange);
+      return () => {
+        window.removeEventListener(EVENT, onStoreChange);
+        window.removeEventListener("storage", onStoreChange);
+      };
+    },
+    () => readLocal(),
+    () => memoryState
+  );
 
   return {
     tickets: supabaseTickets ?? local.tickets,
@@ -354,7 +314,7 @@ export async function addTicket(ticket: Omit<Ticket, "id" | "pair" | "open" | "c
   const newTicket: Ticket = {
     ...ticket,
     id: `t_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-    pair: "CFD AURIX",
+    pair: "XAU/USD",
     open: true,
     createdAt: Date.now(),
   };
@@ -363,8 +323,8 @@ export async function addTicket(ticket: Omit<Ticket, "id" | "pair" | "open" | "c
   const nextTickets = [newTicket, ...current.tickets];
   const newNote: Note = {
     id: `n_${Date.now()}`,
-    title: `New Signal: ${newTicket.side.toUpperCase()} ${newTicket.setup.toUpperCase()}`,
-    body: newTicket.vip ? "VIP plan published." : "FREE CFD Aurix plan published.",
+    title: `Lệnh mới: ${newTicket.side.toUpperCase()} ${newTicket.setup.toUpperCase()}`,
+    body: newTicket.vip ? "Lệnh mới dành cho VIP." : "Lệnh FREE mới đã được công khai.",
     href: "/signals",
     createdAt: Date.now(),
     unread: true,
@@ -384,7 +344,6 @@ export async function addTicket(ticket: Omit<Ticket, "id" | "pair" | "open" | "c
         tp1: newTicket.tp1,
         tp2: newTicket.tp2,
         tp3: newTicket.tp3,
-        note: newTicket.note,
         open: true,
       });
     } catch (e) {
@@ -393,74 +352,7 @@ export async function addTicket(ticket: Omit<Ticket, "id" | "pair" | "open" | "c
   }
 }
 
-// Hàm nạp lệnh lịch sử đã chốt trong quá khứ (vào thẳng Supabase & Performance)
-export async function addClosedTicket(ticket: {
-  pair?: string;
-  side: "buy" | "sell";
-  setup: "limit" | "market";
-  vip: boolean;
-  entry?: string;
-  sl?: string;
-  tp1?: string;
-  tp2?: string;
-  tp3?: string;
-  result: string;
-  pips: number;
-  createdAt: number;
-  closedAt: number;
-  note?: string;
-}) {
-  const sb = getSupabase();
-  const newTicket: Ticket = {
-    ...ticket,
-    id: `t_hist_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-    pair: ticket.pair || "CFD AURIX",
-    open: false,
-    status: ticket.result,
-    pips: ticket.pips,
-    result: ticket.result,
-    createdAt: ticket.createdAt,
-    closedAt: ticket.closedAt,
-  };
-
-  const current = readLocal();
-  const nextTickets = [newTicket, ...current.tickets];
-  writeLocal({ ...current, tickets: nextTickets });
-
-  if (sb) {
-    try {
-      await sb.from("tickets").insert({
-        pair: newTicket.pair,
-        side: newTicket.side,
-        setup: newTicket.setup,
-        status: newTicket.status,
-        vip: newTicket.vip,
-        entry: newTicket.entry,
-        sl: newTicket.sl,
-        tp1: newTicket.tp1,
-        tp2: newTicket.tp2,
-        tp3: newTicket.tp3,
-        result: newTicket.result,
-        pips: newTicket.pips,
-        note: newTicket.note,
-        open: false,
-        created_at: new Date(newTicket.createdAt).toISOString(),
-        closed_at: new Date(newTicket.closedAt ?? Date.now()).toISOString(),
-      });
-    } catch (e) {
-      console.warn("Could not insert closed ticket to Supabase:", e);
-    }
-  }
-}
-
-export function clearMockData() {
-  const current = readLocal();
-  // Xóa các lệnh mẫu (t1..t8) để chỉ hiển thị dữ liệu thật
-  const realTickets = current.tickets.filter((t) => !t.id.match(/^t[1-8]$/));
-  writeLocal({ ...current, tickets: realTickets });
-}
-
-export async function closeTicket(id: string, result: string, pips: number, note?: string) {
+export async function closeTicket(id: string, result: string, pips: number) {
   const current = readLocal();
   const nextTickets = current.tickets.map((t) => {
     if (t.id !== id) return t;
@@ -471,7 +363,6 @@ export async function closeTicket(id: string, result: string, pips: number, note
       result,
       pips,
       closedAt: Date.now(),
-      note: note || t.note,
     };
   });
   writeLocal({ ...current, tickets: nextTickets });
@@ -479,25 +370,15 @@ export async function closeTicket(id: string, result: string, pips: number, note
   const sb = getSupabase();
   if (sb) {
     try {
-      const updatePayload: {
-        open: boolean;
-        status: string;
-        result: string;
-        pips: number;
-        closed_at: string;
-        note?: string;
-      } = {
-        open: false,
-        status: result,
-        result,
-        pips,
-        closed_at: new Date().toISOString(),
-      };
-      if (note) updatePayload.note = note;
-
       await sb
         .from("tickets")
-        .update(updatePayload)
+        .update({
+          open: false,
+          status: result,
+          result,
+          pips,
+          closed_at: new Date().toISOString(),
+        })
         .eq("id", id);
     } catch (e) {
       console.warn("Could not close ticket on Supabase:", e);
@@ -574,7 +455,7 @@ export function ageLabel(ts: number) {
 }
 
 export function pairLabel(_pair?: string) {
-  return "CFD AURIX";
+  return "GOLD";
 }
 
 export function periodMs(period: Period) {

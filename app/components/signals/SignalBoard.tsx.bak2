@@ -86,7 +86,7 @@ export function SignalBoard() {
             <div>
               <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#E2B42A]" />
-                Live CFD Aurix signals
+                Live gold signals
               </p>
               <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-white md:text-4xl">
                 Signal desk
@@ -115,6 +115,7 @@ export function SignalBoard() {
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             {rows.map((t) => {
+              // Lệnh chỉ bị khóa nếu: Lệnh đang mở (open), là lệnh VIP (t.vip), và người dùng chưa có quyền VIP (!unlocked)
               const isLocked = t.open && t.vip && !unlocked;
 
               return (
@@ -128,8 +129,8 @@ export function SignalBoard() {
                   />
                   <div className="relative flex items-start justify-between">
                     <div>
-                      <p suppressHydrationWarning className="text-[12px] text-white/40">
-                        CFD AURIX · {ageLabel(t.createdAt)}
+                      <p className="text-[12px] text-white/40">
+                        GOLD · {ageLabel(t.createdAt)}
                       </p>
                       <p className="mt-2 text-[22px] font-semibold capitalize tracking-[-0.03em] text-white">
                         {ticketTitle(t)}

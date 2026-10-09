@@ -86,7 +86,7 @@ export function SignalBoard() {
             <div>
               <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#E2B42A]" />
-                Live CFD Aurix signals
+                Live gold signals
               </p>
               <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-white md:text-4xl">
                 Signal desk
@@ -115,8 +115,6 @@ export function SignalBoard() {
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             {rows.map((t) => {
-              const isLocked = t.open && t.vip && !unlocked;
-
               return (
                 <article
                   key={t.id}
@@ -128,8 +126,8 @@ export function SignalBoard() {
                   />
                   <div className="relative flex items-start justify-between">
                     <div>
-                      <p suppressHydrationWarning className="text-[12px] text-white/40">
-                        CFD AURIX · {ageLabel(t.createdAt)}
+                      <p className="text-[12px] text-white/40">
+                        GOLD · {ageLabel(t.createdAt)}
                       </p>
                       <p className="mt-2 text-[22px] font-semibold capitalize tracking-[-0.03em] text-white">
                         {ticketTitle(t)}
@@ -137,18 +135,24 @@ export function SignalBoard() {
                       <p className="mt-1 text-xs text-white/40">{t.status}</p>
                     </div>
                     {t.vip ? (
-                      <span className="rounded-full border border-[#E2B42A]/40 bg-[#E2B42A]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#E2B42A]">
-                        VIP ONLY
+                      <span className="rounded-full border border-[#E2B42A]/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#E2B42A]">
+                        VIP
                       </span>
                     ) : (
-                      <span className="rounded-full border border-[#3DCF86]/40 bg-[#3DCF86]/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#3DCF86]">
-                        FREE SIGNAL
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] ${
+                          t.status === "Stopped"
+                            ? "bg-white/5 text-white/50"
+                            : "bg-[#3DCF86]/12 text-[#3DCF86]"
+                        }`}
+                      >
+                        {t.status}
                       </span>
                     )}
                   </div>
 
                   {t.open ? (
-                    !isLocked ? (
+                    unlocked ? (
                       <OpenRows ticket={t} />
                     ) : (
                       <>
@@ -157,7 +161,7 @@ export function SignalBoard() {
                           href="/#pricing"
                           className="relative mt-4 block rounded-full bg-[#E2B42A] px-4 py-2.5 text-center text-[13px] font-semibold text-[#1A1408] hover:bg-[#F0C54A]"
                         >
-                          Unlock Entry &amp; SL (VIP)
+                          Unlock Entry &amp; SL
                         </Link>
                       </>
                     )

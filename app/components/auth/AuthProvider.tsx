@@ -6,128 +6,198 @@ import {
   useContext,
   useEffect,
   useState,
+  type ReactNode,
 } from "react";
-import { lockDesk } from "../../lib/admin";
+import { isAdmin } from "../../lib/admin";
 import { getSupabase } from "../../lib/supabase";
 
-export type DeskUser = {
-  name: string;
+export type Role = "guest" | "user" | "vip" | "admin";
+
+export type AuthUser = {
+  id: string;
   email: string;
+  name: string;
+  role: Role;
+  vip_plan: string | null;
+  vip_expires_at: string | null;
+  isVip: boolean;
 };
 
 type AuthContextValue = {
-  user: DeskUser | null;
+  user: AuthUser | null;
   ready: boolean;
-  login: (email: string, password: string) => Promise<string | null>;
-  signup: (name: string, email: string, password: string) => Promise<string | null>;
+  login: (email: string, pass: string) => Promise<string | null>;
+  signup: (name: string, email: string, pass: string) => Promise<string | null>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function fromSession(session: {
-  user?: { email?: string | null; user_metadata?: { name?: string } };
-} | null): DeskUser | null {
-  const email = session?.user?.email;
-  if (!email) return null;
+function checkIsVip(expiresAt?: string | null): boolean {
+  if (!expiresAt) return false;
+  const time = new Date(expiresAt).getTime();
+  return !isNaN(time) && time > Date.now();
+}
+
+async function fetchFullProfile(userId: string, email: string, name: string): Promise<AuthUser> {
+  const sb = getSupabase();
+  const cleanEmail = email.trim().toLowerCase();
+  const isSuperAdmin = isAdmin(cleanEmail);
+
+  if (!sb) {
+    return {
+      id: userId,
+      email: cleanEmail,
+      name,
+      role: isSuperAdmin ? "admin" : "user",
+      vip_plan: null,
+      vip_expires_at: null,
+      isVip: false,
+    };
+  }
+
+  const { data } = await sb
+    .from("profiles")
+    .select("role, vip_plan, vip_expires_at")
+    .eq("id", userId)
+    .single();
+
+  const isVip = checkIsVip(data?.vip_expires_at);
+
+  let role: Role = "user";
+  if (isSuperAdmin || data?.role === "admin") {
+    role = "admin";
+  } else if (isVip) {
+    role = "vip";
+  }
+
   return {
-    email,
-    name: session?.user?.user_metadata?.name || email.split("@")[0],
+    id: userId,
+    email: cleanEmail,
+    name,
+    role,
+    vip_plan: data?.vip_plan || null,
+    vip_expires_at: data?.vip_expires_at || null,
+    isVip,
   };
 }
 
-async function saveProfile(
-  id: string,
-  email: string,
-  name: string,
-) {
-  const sb = getSupabase();
-  if (!sb) return;
-  await sb.from("profiles").upsert({
-    id,
-    email: email.trim().toLowerCase(),
-    name: name.trim() || email.split("@")[0],
-  });
-}
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<DeskUser | null>(null);
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [ready, setReady] = useState(false);
 
-  useEffect(() => {
+  const syncUser = useCallback(async () => {
     const sb = getSupabase();
     if (!sb) {
-      const timer = window.setTimeout(() => setReady(true), 0);
-      return () => window.clearTimeout(timer);
-    }
-    let alive = true;
-    sb.auth.getSession().then(({ data }) => {
-      if (!alive) return;
-      setUser(fromSession(data.session));
       setReady(true);
-    });
-    const { data: sub } = sb.auth.onAuthStateChange((_event, session) => {
-      setUser(fromSession(session));
-    });
-    return () => {
-      alive = false;
-      sub.subscription.unsubscribe();
-    };
+      return;
+    }
+
+    try {
+      const { data } = await sb.auth.getSession();
+      const session = data?.session;
+      if (!session?.user?.email) {
+        setUser(null);
+      } else {
+        const email = session.user.email;
+        const name = session.user.user_metadata?.name || email.split("@")[0];
+        const fullUser = await fetchFullProfile(session.user.id, email, name);
+        setUser(fullUser);
+      }
+    } catch {
+      setUser(null);
+    } finally {
+      setReady(true);
+    }
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
+  useEffect(() => {
+    syncUser();
+
     const sb = getSupabase();
-    if (!sb) return "Account server is not connected.";
+    if (!sb) return;
+
+    const { data: sub } = sb.auth.onAuthStateChange(async (_event, session) => {
+      if (!session?.user?.email) {
+        setUser(null);
+      } else {
+        const email = session.user.email;
+        const name = session.user.user_metadata?.name || email.split("@")[0];
+        const fullUser = await fetchFullProfile(session.user.id, email, name);
+        setUser(fullUser);
+      }
+    });
+
+    return () => {
+      sub.subscription.unsubscribe();
+    };
+  }, [syncUser]);
+
+  const login = useCallback(async (email: string, pass: string) => {
+    const sb = getSupabase();
+    if (!sb) return "Chưa kết nối máy chủ tài khoản.";
     const { error } = await sb.auth.signInWithPassword({
       email: email.trim(),
-      password,
+      password: pass,
     });
     return error ? error.message : null;
   }, []);
 
-  const signup = useCallback(
-    async (name: string, email: string, password: string) => {
-      if (password.length < 6) return "Password must be at least 6 characters.";
-      const sb = getSupabase();
-      if (!sb) return "Account server is not connected.";
-      const cleanEmail = email.trim();
-      const cleanName = name.trim() || cleanEmail.split("@")[0];
-      const { data, error } = await sb.auth.signUp({
+  const signup = useCallback(async (name: string, email: string, pass: string) => {
+    if (pass.length < 6) return "Mật khẩu tối thiểu 6 ký tự.";
+    const sb = getSupabase();
+    if (!sb) return "Chưa kết nối máy chủ tài khoản.";
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name.trim() || cleanEmail.split("@")[0];
+
+    const { data, error } = await sb.auth.signUp({
+      email: cleanEmail,
+      password: pass,
+      options: {
+        data: { name: cleanName },
+      },
+    });
+
+    if (error) return error.message;
+
+    if (data.user?.id) {
+      await sb.from("profiles").upsert({
+        id: data.user.id,
         email: cleanEmail,
-        password,
-        options: { data: { name: cleanName } },
+        name: cleanName,
+        role: isAdmin(cleanEmail) ? "admin" : "user",
       });
-      if (error) return error.message;
-      if (data.user?.id) {
-        await saveProfile(data.user.id, cleanEmail, cleanName);
-      }
-      return null;
-    },
-    [],
-  );
+    }
+
+    return null;
+  }, []);
 
   const logout = useCallback(async () => {
-    lockDesk();
     const sb = getSupabase();
     if (sb) await sb.auth.signOut();
     setUser(null);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, ready, login, signup, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        ready,
+        login,
+        signup,
+        logout,
+        refreshUser: syncUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
-const FALLBACK: AuthContextValue = {
-  user: null,
-  ready: true,
-  login: async () => "Auth is not ready.",
-  signup: async () => "Auth is not ready.",
-  logout: async () => {},
-};
-
 export function useAuth() {
-  return useContext(AuthContext) ?? FALLBACK;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
 }
